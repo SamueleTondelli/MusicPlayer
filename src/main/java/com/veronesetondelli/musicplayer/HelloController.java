@@ -2,17 +2,13 @@ package com.veronesetondelli.musicplayer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 
 public class HelloController {
-    @FXML
-    private Label welcomeText;
     @FXML
     private Button btn;
     Playlist playlist;
     @FXML
     protected void onLoadButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
         if (playlist == null) {
             playlist = new Playlist();
             playlist.addSong("C:\\Users\\samue\\IdeaProjects\\MusicPlayer\\src\\main\\resources\\com\\veronesetondelli" + "\\musicplayer\\chepalle.wav");
@@ -49,5 +45,9 @@ public class HelloController {
     void onStopButtonPress() {
         btn.setText("pause");
         playlist.stop = true;
+    }
+
+    void handleCreatePlaylist() {
+
     }
 }
