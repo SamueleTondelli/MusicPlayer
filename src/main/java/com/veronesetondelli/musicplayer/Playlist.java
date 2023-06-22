@@ -10,10 +10,13 @@ public class Playlist implements Runnable{
     boolean skip;
     boolean stop;
     int index;
+    String name;
 
-    public Playlist() {
+    public Playlist(String name) {
         songList = new ArrayList<String>();
         player = new AudioPlayer();
+        this.name = name;
+        stop = true;
     }
 
     void addSong(String name) {
