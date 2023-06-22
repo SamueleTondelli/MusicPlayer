@@ -3,15 +3,15 @@ package com.veronesetondelli.musicplayer;
 import javax.sound.sampled.*;
 import java.io.File;
 
-public class AudioPlayer implements LineListener, Runnable {
-    private boolean playHasEnded;
+public class AudioPlayer implements LineListener {
+    boolean playHasEnded;
     private Clip clip;
-    boolean isPlaying = false;
+    FloatControl volumeControl;
     public AudioPlayer() {}
 
     @Override
     public void update(LineEvent event) {
-        if (event.getType() == LineEvent.Type.STOP) {
+        if (event.getType() == LineEvent.Type.STOP && clip.getMicrosecondPosition() == clip.getMicrosecondLength()) {
             playHasEnded = true;
         }
     }
@@ -25,24 +25,24 @@ public class AudioPlayer implements LineListener, Runnable {
             clip = (Clip) AudioSystem.getLine(info);
             clip.addLineListener(this);
             clip.open(stream);
+            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeControl.setValue(volumeControl.getMaximum());
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void run() {
-        isPlaying = true;
+    void close() {
+        stop();
+        clip.close();
+    }
+
+    public void play() {
         playHasEnded = false;
         clip.start();
-        while(!playHasEnded) {
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return;
-            }
-        }
-        isPlaying = false;
+    }
+
+    public void stop() {
+        clip.stop();
     }
 }

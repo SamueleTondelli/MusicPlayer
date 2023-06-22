@@ -59,6 +59,7 @@ public class Playlist implements Runnable{
                     player.stop();
                     break;
                 }
+
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
@@ -66,6 +67,7 @@ public class Playlist implements Runnable{
                     return;
                 }
             }
+            player.close();
             index = (index + 1) % songList.size();
             loadCurrentIndex();
             playCurrentIndex();
