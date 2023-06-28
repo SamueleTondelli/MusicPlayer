@@ -8,6 +8,7 @@ public class SampleNewPlaylistController {
     @FXML
     private TextField playlistNameField;
     Playlist playlist;
+
     @FXML
     public void initialize() {
         playlistNameField.textProperty().addListener((observable, oldValue, newValue) -> playlist.name = newValue);

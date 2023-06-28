@@ -1,48 +1,71 @@
 package com.veronesetondelli.musicplayer;
 
-import javax.sound.sampled.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class AudioPlayer implements LineListener {
-    boolean playHasEnded;
-    private Clip clip;
-    FloatControl volumeControl;
-    public AudioPlayer() {}
+public class AudioPlayer {
+    private boolean playing;
+    private Media media;
+    private MediaPlayer mediaPlayer;
+    private Timer timer;
+    private TimerTask task;
+    String name;
 
-    @Override
-    public void update(LineEvent event) {
-        if (event.getType() == LineEvent.Type.STOP && clip.getMicrosecondPosition() == clip.getMicrosecondLength()) {
-            playHasEnded = true;
-        }
-    }
+    AudioPlayer () { playing = false;}
 
-    public void loadAudioFile(String filename) {
+    public void loadAudioFile(String fileName) {
         try {
-            File f = new File(filename);
-            AudioInputStream stream = AudioSystem.getAudioInputStream(f);
-            AudioFormat format = stream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
-            clip = (Clip) AudioSystem.getLine(info);
-            clip.addLineListener(this);
-            clip.open(stream);
-            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            volumeControl.setValue(volumeControl.getMaximum());
-        } catch(Exception e) {
+            name = fileName;
+            File file = new File(fileName);
+            media = new Media(file.toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void close() {
-        stop();
-        clip.close();
+    public void play() {
+        if (!playing) {
+            beginTimer();
+            playing = true;
+        }
+        mediaPlayer.play();
     }
 
-    public void play() {
-        playHasEnded = false;
-        clip.start();
+    public void pause() {
+        mediaPlayer.pause();
     }
 
     public void stop() {
-        clip.stop();
+        cancelTimer();
+        mediaPlayer.stop();
+    }
+
+    private void beginTimer() {
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                playing = true;
+                if (mediaPlayer.getCurrentTime().toSeconds() >= media.getDuration().toSeconds()) {
+                    cancelTimer();
+                }
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 1000, 1000);
+    }
+
+    private void cancelTimer() {
+        playing = false;
+        timer.cancel();
+    }
+
+    public boolean isPlaying() {
+        return playing;
     }
 }

@@ -10,11 +10,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class SampleController {
+public class SampleController implements Runnable{
     @FXML
     private Button btn;
     ArrayList<Playlist> playlist = new ArrayList<>();
     int currentlySelectedPlaylist = 0;
+    private boolean playing;
+    private boolean skip;
+    private boolean stop;
     @FXML
     private Label currentPlaylistLabel;
     @FXML
@@ -25,38 +28,40 @@ public class SampleController {
             p.addSong("C:\\Users\\samue\\IdeaProjects\\MusicPlayer\\src\\main\\resources\\com\\veronesetondelli" + "\\musicplayer\\vecchio.wav");
             playlist.add(p);
             currentPlaylistLabel.setText(p.name);
-            Thread t = new Thread(playlist.get(0));
+            Thread t = new Thread(this);
             t.start();
         }
-        else if (playlist.get(currentlySelectedPlaylist).stop) {
+        else if (stop) {
             playlist.get(currentlySelectedPlaylist).index = 0;
-            Thread t = new Thread(playlist.get(currentlySelectedPlaylist));
+            Thread t = new Thread(this);
             t.start();
         }
     }
 
     @FXML
     void onPlayButtonClick() {
-        if (playlist.get(currentlySelectedPlaylist).stop) return;
-        if (playlist.get(currentlySelectedPlaylist).playing) {
+        if (stop) return;
+        if (playing) {
             btn.setText("play");
             playlist.get(currentlySelectedPlaylist).pause();
+            playing = false;
         }
         else {
             btn.setText("pause");
             playlist.get(currentlySelectedPlaylist).playCurrentIndex();
+            playing = true;
         }
     }
 
     @FXML
     void onSkipButtonPress() {
-        if (!playlist.get(currentlySelectedPlaylist).stop) {playlist.get(currentlySelectedPlaylist).skip = true;}
+        if (!stop) {skip = true;}
     }
 
     @FXML
     void onStopButtonPress() {
         btn.setText("pause");
-        playlist.get(currentlySelectedPlaylist).stop = true;
+        stop = true;
     }
 
     @FXML
@@ -102,6 +107,38 @@ public class SampleController {
             playlist.get(currentlySelectedPlaylist).addSong(file.getAbsolutePath());
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Could not load song").showAndWait();
+        }
+    }
+
+    @Override
+    public void run() {
+        playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
+        playlist.get(currentlySelectedPlaylist).playCurrentIndex();
+        stop = false;
+        playing = true;
+        while (true) {
+            skip = false;
+            while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
+                if (stop) {
+                    playing = false;
+                    playlist.get(currentlySelectedPlaylist).player.stop();
+                    return;
+                }
+                if (skip) {
+                    playlist.get(currentlySelectedPlaylist).player.stop();
+                    break;
+                }
+
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            playlist.get(currentlySelectedPlaylist).nextSong();
+            playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
+            playlist.get(currentlySelectedPlaylist).playCurrentIndex();
         }
     }
 }
