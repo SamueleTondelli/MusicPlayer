@@ -68,4 +68,12 @@ public class AudioPlayer {
     public boolean isPlaying() {
         return playing;
     }
+
+    public void setVolume(double volume) {
+        mediaPlayer.setVolume(volume);
+    }
+
+    public double getVolume() {
+        return mediaPlayer.getVolume();
+    }
 }

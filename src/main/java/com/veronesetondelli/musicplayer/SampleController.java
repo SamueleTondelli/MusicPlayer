@@ -110,6 +110,17 @@ public class SampleController implements Runnable{
         }
     }
 
+    @FXML
+    void onVolumeButtonClick() {
+        double currVol = playlist.get(currentlySelectedPlaylist).getVolume();
+        if (currVol < 1.0) {
+            playlist.get(currentlySelectedPlaylist).setVolume(currVol + 0.1);
+        }
+        else {
+            playlist.get(currentlySelectedPlaylist).setVolume(0.0);
+        }
+    }
+
     @Override
     public void run() {
         playlist.get(currentlySelectedPlaylist).loadCurrentIndex();

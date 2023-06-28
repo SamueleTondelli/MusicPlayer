@@ -15,29 +15,31 @@ public class Playlist{
         this.name = name;
     }
 
-    void addSong(String name) {
+    public void addSong(String name) {
         songList.add(name);
     }
 
-    void removeSong(String name) {
+    public void removeSong(String name) {
         songList.remove(name);
     }
 
-    void removeSong(int index) throws IndexOutOfBoundsException{
-        songList.remove(index);
-    }
+    public void removeSong(int index) throws IndexOutOfBoundsException{ songList.remove(index); }
 
-    void playCurrentIndex() {
-        player.play();
-    }
+    public void playCurrentIndex() { player.play(); }
 
-    void pause() {
-        player.pause();
-    }
+    public void pause() { player.pause(); }
 
-    void loadCurrentIndex() {
+    public void loadCurrentIndex() {
         player.loadAudioFile(songList.get(index));
     }
 
-    void nextSong() { index = (index + 1) % songList.size(); }
+    public void nextSong() { index = (index + 1) % songList.size(); }
+
+    public void setVolume(double volume) {
+        player.setVolume(volume);
+    }
+
+    public double getVolume() {
+        return player.getVolume();
+    }
 }
