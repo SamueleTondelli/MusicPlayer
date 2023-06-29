@@ -76,4 +76,8 @@ public class AudioPlayer {
     public double getVolume() {
         return mediaPlayer.getVolume();
     }
+
+    public double getPlayingTimeSeconds() { return mediaPlayer.getCurrentTime().toSeconds(); }
+
+    public double getSongLengthSeconds() { return media.getDuration().toSeconds(); }
 }

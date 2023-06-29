@@ -1,5 +1,6 @@
 package com.veronesetondelli.musicplayer;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -34,6 +35,9 @@ public class MusicPlayerController implements Runnable{
     private Slider volumeSlider;
     @FXML
     private Label currentPlaylistLabel;
+
+    @FXML
+    private Slider songProgressSlider;
     @FXML
     protected void onLoadButtonClick() {
         if (playlist.size() == 0) {
@@ -111,7 +115,7 @@ public class MusicPlayerController implements Runnable{
     void handleAddSongClick() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("WAV files (*.wav)", "*.wav"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio files (*.wav, *.mp3)", "*.wav", "*.mp3"));
 
             File file = fileChooser.showOpenDialog(null);
             playlist.get(currentlySelectedPlaylist).addSong(file.getAbsolutePath());
@@ -154,6 +158,12 @@ public class MusicPlayerController implements Runnable{
         while (true) {
             skip = false;
             while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        songProgressSlider.setValue(playlist.get(currentlySelectedPlaylist).getCurrentSongProgress());
+                    }
+                });
                 if (stop) {
                     playing = false;
                     playlist.get(currentlySelectedPlaylist).player.stop();

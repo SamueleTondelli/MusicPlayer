@@ -1,5 +1,6 @@
 package com.veronesetondelli.musicplayer;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,8 @@ public class Playlist{
 
     public void removeSong(int index) throws IndexOutOfBoundsException{ songList.remove(index); }
 
+    public void removeAllSongs() { songList.clear(); }
+
     public void playCurrentIndex() { player.play(); }
 
     public void pause() { player.pause(); }
@@ -42,4 +45,10 @@ public class Playlist{
     public double getVolume() {
         return player.getVolume();
     }
+
+    public String getCurrentSongName() {
+        return Paths.get(songList.get(index)).getFileName().toString();
+    }
+
+    public double getCurrentSongProgress() { return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100; }
 }
