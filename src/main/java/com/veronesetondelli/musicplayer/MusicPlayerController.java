@@ -168,6 +168,7 @@ public class MusicPlayerController implements Runnable{
         stop = false;
         playing = true;
         while (true) {
+            playlist.get(currentlySelectedPlaylist).setVolume(volumeSlider.getValue() * 0.01);
             skip = false;
             while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
                 if (updateProgressBar) {
