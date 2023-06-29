@@ -1,5 +1,8 @@
 package com.veronesetondelli.musicplayer;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +12,7 @@ import javafx.stage.Modality;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SampleController implements Runnable{
@@ -19,12 +23,24 @@ public class SampleController implements Runnable{
     private boolean playing = false;
     private boolean skip = false;
     private boolean stop = true;
+    private boolean jump = false;
     @FXML
     private Label currentPlaylistLabel;
     @FXML
     private Label secondsLabel;
     @FXML
     private Label currentSongLabel;
+    @FXML
+    private ListView<String> songListView;
+
+    @FXML
+    void initialize() {
+        songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            playlist.get(currentlySelectedPlaylist).index = newValue.intValue();
+            jump = true;
+        });
+    }
+
     @FXML
     protected void onLoadButtonClick() {
         if (playlist.size() == 0) {
@@ -97,6 +113,7 @@ public class SampleController implements Runnable{
     void onNextPlaylistButtonClick() {
         currentlySelectedPlaylist = (currentlySelectedPlaylist + 1) % playlist.size();
         currentPlaylistLabel.setText(playlist.get(currentlySelectedPlaylist).name);
+        songListView.setItems(playlist.get(currentlySelectedPlaylist).getSongNames());
     }
 
     @FXML
@@ -147,6 +164,43 @@ public class SampleController implements Runnable{
         }
     }
 
+    @FXML
+    void handleLoadAsJSON() {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"));
+
+            File file = chooser.showOpenDialog(null);
+            if (file != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                List<String> songs = mapper.readValue(file, new TypeReference<>() {});
+                Playlist p = new Playlist(file.getName().substring(0, file.getName().length() - 5));
+                p.addSongs(songs);
+                playlist.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleSaveAsJSON() {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"));
+
+            File file = chooser.showSaveDialog(null);
+            if (file != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlist.get(currentlySelectedPlaylist).songList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
@@ -171,7 +225,7 @@ public class SampleController implements Runnable{
                     playlist.get(currentlySelectedPlaylist).player.stop();
                     return;
                 }
-                if (skip) {
+                if (skip || jump) {
                     playlist.get(currentlySelectedPlaylist).player.stop();
                     break;
                 }
@@ -183,7 +237,11 @@ public class SampleController implements Runnable{
                     return;
                 }
             }
-            playlist.get(currentlySelectedPlaylist).nextSong();
+            if (!jump) {
+                playlist.get(currentlySelectedPlaylist).nextSong();
+            } else {
+                jump = false;
+            }
             playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
             playlist.get(currentlySelectedPlaylist).playCurrentIndex();
         }
