@@ -2,6 +2,7 @@ package com.veronesetondelli.musicplayer;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.util.Timer;
@@ -80,4 +81,8 @@ public class AudioPlayer {
     public double getPlayingTimeSeconds() { return mediaPlayer.getCurrentTime().toSeconds(); }
 
     public double getSongLengthSeconds() { return media.getDuration().toSeconds(); }
+
+    public void setSongProgress(double progress) {
+        mediaPlayer.seek(Duration.millis((media.getDuration().toMillis() * progress) / 100));
+    }
 }

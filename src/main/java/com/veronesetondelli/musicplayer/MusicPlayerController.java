@@ -30,6 +30,7 @@ public class MusicPlayerController implements Runnable{
     private boolean skip = false;
     private boolean stop = true;
     private boolean mute = false;
+    private boolean updateProgressBar = true;
     private double currVol;
     @FXML
     private Slider volumeSlider;
@@ -149,6 +150,17 @@ public class MusicPlayerController implements Runnable{
         }
     }
 
+    @FXML
+    void handleSongProgressChange() {
+        playlist.get(currentlySelectedPlaylist).setCurrentSongProgress(songProgressSlider.getValue());
+        updateProgressBar = true;
+    }
+
+    @FXML
+    void onSongProgressSliderPress() {
+        updateProgressBar = false;
+    }
+
     @Override
     public void run() {
         playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
@@ -158,12 +170,14 @@ public class MusicPlayerController implements Runnable{
         while (true) {
             skip = false;
             while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        songProgressSlider.setValue(playlist.get(currentlySelectedPlaylist).getCurrentSongProgress());
-                    }
-                });
+                if (updateProgressBar) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            songProgressSlider.setValue(playlist.get(currentlySelectedPlaylist).getCurrentSongProgress());
+                        }
+                    });
+                }
                 if (stop) {
                     playing = false;
                     playlist.get(currentlySelectedPlaylist).player.stop();

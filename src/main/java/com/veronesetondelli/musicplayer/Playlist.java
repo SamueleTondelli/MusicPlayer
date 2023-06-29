@@ -51,4 +51,6 @@ public class Playlist{
     }
 
     public double getCurrentSongProgress() { return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100; }
+
+    public void setCurrentSongProgress(double progress) { player.setSongProgress(progress); }
 }
