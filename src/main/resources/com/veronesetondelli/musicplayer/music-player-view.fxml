@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.MusicPlayerController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <left>
+      <AnchorPane prefHeight="374.0" prefWidth="202.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" AnchorPane.leftAnchor="14.0">
+               <graphic>
+                  <HBox prefHeight="34.0" prefWidth="187.0">
+                     <children>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@foldericon.png" />
+                           </image>
+                        </ImageView>
+                        <Label text="Add playlist">
+                           <HBox.margin>
+                              <Insets top="7.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                  </HBox>
+               </graphic>
+            </Button>
+            <Button layoutX="14.0" layoutY="69.0" mnemonicParsing="false" onAction="#handleCreatePlaylist" prefHeight="44.0" prefWidth="114.0" text="Create Playlist" />
+            <Button layoutX="14.0" layoutY="126.0" mnemonicParsing="false" onAction="#handleAddSongClick" prefHeight="44.0" prefWidth="114.0" text="Add Song" />
+         </children>
+      </AnchorPane>
+   </left>
+   <center>
+      <AnchorPane prefHeight="374.0" prefWidth="406.0" BorderPane.alignment="CENTER">
+         <children>
+            <Slider fx:id="volumeSlider" blockIncrement="1.0" layoutX="199.0" layoutY="31.0" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="31.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Slider>
+            <Button fx:id="muteBtn" contentDisplay="CENTER" layoutX="339.0" layoutY="25.0" mnemonicParsing="false" onAction="#onMuteButtonClick" text="Mute" textAlignment="JUSTIFY" AnchorPane.leftAnchor="324.40000000000003" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="25.0" />
+            <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="141.0" layoutY="29.0" text="volume" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="29.0" />
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="98.0" prefWidth="687.0" BorderPane.alignment="CENTER">
+         <children>
+            <Slider blockIncrement="1.0" layoutX="200.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="6.0" prefWidth="500.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></Slider>
+            <Button layoutX="324.0" layoutY="13.0" mnemonicParsing="false" onAction="#onPlayButtonClick">
+               <graphic>
+                  <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@play-button.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="397.0" layoutY="15.0" mnemonicParsing="false" onAction="#onSkipButtonPress">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onSkipButtonPress" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@next-button.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button layoutX="254.0" layoutY="15.0" mnemonicParsing="false">
+               <graphic>
+                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@prev-button.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </AnchorPane>
+   </bottom>
+</BorderPane>
