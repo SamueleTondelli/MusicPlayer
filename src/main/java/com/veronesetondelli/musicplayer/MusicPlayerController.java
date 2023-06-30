@@ -1,5 +1,8 @@
 package com.veronesetondelli.musicplayer;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -12,6 +15,7 @@ import javafx.stage.Modality;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class MusicPlayerController implements Runnable{
@@ -28,17 +32,43 @@ public class MusicPlayerController implements Runnable{
     int currentlySelectedPlaylist = 0;
     private boolean playing = false;
     private boolean skip = false;
+    private boolean previous = false;
     private boolean stop = true;
     private boolean mute = false;
     private boolean updateProgressBar = true;
+    private boolean jump = false;
     private double currVol;
     @FXML
     private Slider volumeSlider;
     @FXML
     private Label currentPlaylistLabel;
-
+    @FXML
+    private Label currentSongProgress;
+    @FXML
+    private Label currentSongLabel;
+    @FXML
+    private Label secondsLabel;
     @FXML
     private Slider songProgressSlider;
+    @FXML
+    private ListView<String> songListView;
+
+    @FXML
+    void initialize() {
+        songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            playlist.get(currentlySelectedPlaylist).index = newValue.intValue();
+            jump = true;
+        });
+
+        volumeSlider.setValue(volumeSlider.getMax());
+
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                playlist.get(currentlySelectedPlaylist).setVolume(volumeSlider.getValue() * 0.01);
+            }
+        });
+    }
     @FXML
     protected void onLoadButtonClick() {
         if (playlist.size() == 0) {
@@ -56,7 +86,6 @@ public class MusicPlayerController implements Runnable{
             t.start();
         }
     }
-
     @FXML
     void onPlayButtonClick() {
         if (stop) return;
@@ -70,18 +99,22 @@ public class MusicPlayerController implements Runnable{
             playing = true;
         }
     }
-
     @FXML
     void onSkipButtonPress() {
         if (!stop) {skip = true;}
     }
-
+    @FXML
+    void onPreviousButtonPress() {
+        if (!stop) {
+            previous = true;
+            playlist.get(currentlySelectedPlaylist).previousSong();
+        }
+    }
     @FXML
     void onStopButtonPress() {
         //btn.setText("pause");
         stop = true;
     }
-
     @FXML
     void handleCreatePlaylist() {
         try {
@@ -105,13 +138,35 @@ public class MusicPlayerController implements Runnable{
             e.printStackTrace();
         }
     }
+    @FXML
+    void handlePlaylistFromFolder() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("sample-playlist-from-folder-view.fxml"));
+            DialogPane view = loader.load();
+            SamplePlaylistFromFolderController controller = loader.getController();
 
+            controller.setPlaylist(new Playlist("name"));
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("New Playlist");
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setDialogPane(view);
+
+            Optional<ButtonType> clickedButton = dialog.showAndWait();
+            if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                playlist.add(controller.getPlaylist());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     void onNextPlaylistButtonClick() {
         currentlySelectedPlaylist = (currentlySelectedPlaylist + 1) % playlist.size();
         currentPlaylistLabel.setText(playlist.get(currentlySelectedPlaylist).name);
+        songListView.setItems(playlist.get(currentlySelectedPlaylist).getSongNames());
     }
-
     @FXML
     void handleAddSongClick() {
         try {
@@ -124,43 +179,63 @@ public class MusicPlayerController implements Runnable{
             new Alert(Alert.AlertType.ERROR, "Could not load song").showAndWait();
         }
     }
+    @FXML
+    void handleLoadAsJSON() {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"));
 
-    /*@FXML
-    void onVolumeButtonClick() {
-        double currVol = playlist.get(currentlySelectedPlaylist).getVolume();
-        if (currVol < 1.0) {
-            playlist.get(currentlySelectedPlaylist).setVolume(currVol + 0.1);
+            File file = chooser.showOpenDialog(null);
+            if (file != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                List<String> songs = mapper.readValue(file, new TypeReference<>() {});
+                Playlist p = new Playlist(file.getName().substring(0, file.getName().length() - 5));
+                p.addSongs(songs);
+                playlist.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        else {
-            playlist.get(currentlySelectedPlaylist).setVolume(0.0);
-        }
-    }*/
+    }
+    @FXML
+    void handleSaveAsJSON() {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json"));
 
+            File file = chooser.showSaveDialog(null);
+            if (file != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlist.get(currentlySelectedPlaylist).songList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     void onMuteButtonClick() {
         if(!mute) {
             mute = true;
             muteBtn.setText("Unmute");
-            currVol = playlist.get(currentlySelectedPlaylist).getVolume();
-            playlist.get(currentlySelectedPlaylist).setVolume(0.0);
+            currVol = volumeSlider.getValue();
+            volumeSlider.setValue(0.0);
         } else {
             mute = false;
             muteBtn.setText("Mute");
-            playlist.get(currentlySelectedPlaylist).setVolume(currVol);
+            volumeSlider.setValue(currVol);
         }
     }
-
     @FXML
     void handleSongProgressChange() {
         playlist.get(currentlySelectedPlaylist).setCurrentSongProgress(songProgressSlider.getValue());
         updateProgressBar = true;
     }
-
     @FXML
     void onSongProgressSliderPress() {
         updateProgressBar = false;
     }
-
     @Override
     public void run() {
         playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
@@ -170,12 +245,23 @@ public class MusicPlayerController implements Runnable{
         while (true) {
             playlist.get(currentlySelectedPlaylist).setVolume(volumeSlider.getValue() * 0.01);
             skip = false;
+            previous = false;
+
+            Platform.runLater(new Runnable() {
+                public void run() {
+                    currentSongLabel.setText(playlist.get(currentlySelectedPlaylist).getCurrentSongName());
+                }
+            });
+
             while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
                 if (updateProgressBar) {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
                             songProgressSlider.setValue(playlist.get(currentlySelectedPlaylist).getCurrentSongProgress());
+                            secondsLabel.setText(Double.toString(playlist.get(currentlySelectedPlaylist).player.getPlayingTimeSeconds()));
+                            volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
+                            currentSongProgress.setText(Double.toString(playlist.get(currentlySelectedPlaylist).getCurrentSongProgress()));
                         }
                     });
                 }
@@ -184,7 +270,7 @@ public class MusicPlayerController implements Runnable{
                     playlist.get(currentlySelectedPlaylist).player.stop();
                     return;
                 }
-                if (skip) {
+                if (skip || jump || previous) {
                     playlist.get(currentlySelectedPlaylist).player.stop();
                     break;
                 }
@@ -196,23 +282,15 @@ public class MusicPlayerController implements Runnable{
                     return;
                 }
             }
-            playlist.get(currentlySelectedPlaylist).nextSong();
+            if (!jump) {
+                playlist.get(currentlySelectedPlaylist).nextSong();
+            } else {
+                jump = false;
+            }
+
+
             playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
             playlist.get(currentlySelectedPlaylist).playCurrentIndex();
         }
-    }
-
-    public void initialize() {
-        volumeSlider.setValue(volumeSlider.getMax());
-
-        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                playlist.get(currentlySelectedPlaylist).setVolume(volumeSlider.getValue() * 0.01);
-            }
-        });
-
-        //writing current volume value on the label
-        //volumeLabel.setText(volumeSlider.valueProperty().getValue().toString());
     }
 }

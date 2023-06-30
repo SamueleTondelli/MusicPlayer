@@ -42,6 +42,11 @@ public class Playlist{
     }
 
     public void nextSong() { index = (index + 1) % songList.size(); }
+    public void previousSong() {
+        if((getCurrentSongProgress()) > 50) {
+            index = index == 0 ? songList.size() - 1 : index - 1;
+        }
+    }
 
     public void setVolume(double volume) {
         player.setVolume(volume);
