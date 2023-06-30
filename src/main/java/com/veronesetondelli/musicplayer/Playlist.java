@@ -14,8 +14,17 @@ public class Playlist{
     String name;
 
     public Playlist(String name) {
+        index = 0;
         songList = FXCollections.observableArrayList();
         player = new AudioPlayer();
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -70,5 +79,9 @@ public class Playlist{
             names.add(Paths.get(s).getFileName().toString());
         }
         return names;
+    }
+
+    public String getCurrentSong() {
+        return songList.get(index);
     }
 }

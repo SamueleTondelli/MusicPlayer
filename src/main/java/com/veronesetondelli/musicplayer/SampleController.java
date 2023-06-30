@@ -4,26 +4,29 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class SampleController implements Runnable{
     @FXML
     private Button btn;
-    ArrayList<Playlist> playlist = new ArrayList<>();
-    int currentlySelectedPlaylist = 0;
-    private boolean playing = false;
-    private boolean skip = false;
-    private boolean stop = true;
-    private boolean jump = false;
+    ObservableList<Playlist> playlistList;
+    int currentlyPlayingPlaylist;
+    int currentlySelectedPlaylist;
+    private boolean playing;
+    private boolean skip;
+    private boolean stop;
+    private boolean jump;
     @FXML
     private Label currentPlaylistLabel;
     @FXML
@@ -32,28 +35,63 @@ public class SampleController implements Runnable{
     private Label currentSongLabel;
     @FXML
     private ListView<String> songListView;
+    @FXML
+    private TableView<Playlist> playlistListTable;
+    @FXML
+    private TableColumn<Playlist, String> playlistNameColumn;
 
     @FXML
     void initialize() {
+        currentlyPlayingPlaylist = 0;
+        playing = false;
+        skip = false;
+        stop = true;
+        jump = false;
+
+        playlistList = FXCollections.observableArrayList();
+        playlistNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        playlistListTable.setItems(playlistList);
+
+        playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            currentlySelectedPlaylist = newValue.intValue();
+            songListView.getSelectionModel().clearSelection();
+            songListView.setItems(playlistList.get(currentlySelectedPlaylist).getSongNames());
+        });
+
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            playlist.get(currentlySelectedPlaylist).index = newValue.intValue();
-            jump = true;
+            if (newValue.intValue() == -1) return;
+            if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
+                if (!stop) {
+                    playlistList.get(currentlyPlayingPlaylist).player.stop();
+                    playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+                    jump = true;
+                } else {
+                    playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+                    Thread t = new Thread(this);
+                    t.start();
+                }
+            } else {
+                jump = true;
+                playlistList.get(currentlyPlayingPlaylist).player.stop();
+                currentlyPlayingPlaylist = currentlySelectedPlaylist;
+                playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+            }
         });
     }
 
     @FXML
     protected void onLoadButtonClick() {
-        if (playlist.size() == 0) {
+        if (playlistList.size() == 0) {
             Playlist p = new Playlist("p1");
             p.addSong("C:\\Users\\samue\\Desktop\\wq-ost\\1-01 The Witch Queen.mp3");
             p.addSong("C:\\Users\\samue\\Desktop\\wq-ost\\1-02 Lucent World.mp3");
-            playlist.add(p);
+            playlistList.add(p);
             currentPlaylistLabel.setText(p.name);
             Thread t = new Thread(this);
             t.start();
         }
         else if (stop) {
-            playlist.get(currentlySelectedPlaylist).index = 0;
+            playlistList.get(currentlyPlayingPlaylist).index = 0;
             Thread t = new Thread(this);
             t.start();
         }
@@ -64,19 +102,22 @@ public class SampleController implements Runnable{
         if (stop) return;
         if (playing) {
             btn.setText("play");
-            playlist.get(currentlySelectedPlaylist).pause();
+            playlistList.get(currentlyPlayingPlaylist).pause();
             playing = false;
         }
         else {
             btn.setText("pause");
-            playlist.get(currentlySelectedPlaylist).playCurrentIndex();
+            playlistList.get(currentlyPlayingPlaylist).playCurrentIndex();
             playing = true;
         }
     }
 
     @FXML
     void onSkipButtonPress() {
-        if (!stop) {skip = true;}
+        if (!stop) {
+            skip = true;
+            playlistList.get(currentlyPlayingPlaylist).player.stop();
+        }
     }
 
     @FXML
@@ -102,7 +143,8 @@ public class SampleController implements Runnable{
 
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                playlist.add(controller.getPlaylist());
+                playlistList.add(controller.getPlaylist());
+                playlistListTable.setItems(playlistList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,9 +153,9 @@ public class SampleController implements Runnable{
 
     @FXML
     void onNextPlaylistButtonClick() {
-        currentlySelectedPlaylist = (currentlySelectedPlaylist + 1) % playlist.size();
-        currentPlaylistLabel.setText(playlist.get(currentlySelectedPlaylist).name);
-        songListView.setItems(playlist.get(currentlySelectedPlaylist).getSongNames());
+        currentlyPlayingPlaylist = (currentlyPlayingPlaylist + 1) % playlistList.size();
+        currentPlaylistLabel.setText(playlistList.get(currentlyPlayingPlaylist).name);
+        songListView.setItems(playlistList.get(currentlyPlayingPlaylist).getSongNames());
     }
 
     @FXML
@@ -123,7 +165,8 @@ public class SampleController implements Runnable{
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio files (*.wav, *.mp3)", "*.wav", "*.mp3"));
 
             File file = fileChooser.showOpenDialog(null);
-            playlist.get(currentlySelectedPlaylist).addSong(file.getAbsolutePath());
+            playlistList.get(currentlyPlayingPlaylist).addSong(file.getAbsolutePath());
+            songListView.setItems(playlistList.get(currentlyPlayingPlaylist).getSongNames());
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Could not load song").showAndWait();
         }
@@ -131,12 +174,12 @@ public class SampleController implements Runnable{
 
     @FXML
     void onVolumeButtonClick() {
-        double currVol = playlist.get(currentlySelectedPlaylist).getVolume();
+        double currVol = playlistList.get(currentlyPlayingPlaylist).getVolume();
         if (currVol < 1.0) {
-            playlist.get(currentlySelectedPlaylist).setVolume(currVol + 0.1);
+            playlistList.get(currentlyPlayingPlaylist).setVolume(currVol + 0.1);
         }
         else {
-            playlist.get(currentlySelectedPlaylist).setVolume(0.0);
+            playlistList.get(currentlyPlayingPlaylist).setVolume(0.0);
         }
     }
 
@@ -157,7 +200,8 @@ public class SampleController implements Runnable{
 
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                playlist.add(controller.getPlaylist());
+                playlistList.add(controller.getPlaylist());
+                playlistListTable.setItems(playlistList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,7 +221,8 @@ public class SampleController implements Runnable{
                 List<String> songs = mapper.readValue(file, new TypeReference<>() {});
                 Playlist p = new Playlist(file.getName().substring(0, file.getName().length() - 5));
                 p.addSongs(songs);
-                playlist.add(p);
+                playlistList.add(p);
+                playlistListTable.setItems(playlistList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,7 +239,7 @@ public class SampleController implements Runnable{
             if (file != null) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.registerModule(new JavaTimeModule());
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlist.get(currentlySelectedPlaylist).songList);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlistList.get(currentlyPlayingPlaylist).songList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,47 +248,38 @@ public class SampleController implements Runnable{
 
     @Override
     public void run() {
-        playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
-        playlist.get(currentlySelectedPlaylist).playCurrentIndex();
-        stop = false;
-        playing = true;
         while (true) {
+            playlistList.get(currentlyPlayingPlaylist).loadCurrentIndex();
+            playlistList.get(currentlyPlayingPlaylist).playCurrentIndex();
+            stop = false;
+            playing = true;
+            System.out.println("Playing " + playlistList.get(currentlyPlayingPlaylist).getCurrentSongName() + " from " + playlistList.get(currentlyPlayingPlaylist).name + " (" + currentlyPlayingPlaylist + ")");
             skip = false;
-            Platform.runLater(new Runnable() {
-                public void run() {
-                    currentSongLabel.setText(playlist.get(currentlySelectedPlaylist).getCurrentSongName());
-                }
+            Platform.runLater(() ->  {
+                currentSongLabel.setText(playlistList.get(currentlyPlayingPlaylist).getCurrentSongName());
+                songListView.getSelectionModel().clearSelection();
             });
-            while (playlist.get(currentlySelectedPlaylist).player.isPlaying()) {
-                Platform.runLater(new Runnable() {
-                    public void run() {
-                        secondsLabel.setText(Double.toString(playlist.get(currentlySelectedPlaylist).player.getPlayingTimeSeconds()));
-                    }
-                });
+            while (playlistList.get(currentlyPlayingPlaylist).player.isPlaying()) {
                 if (stop) {
                     playing = false;
-                    playlist.get(currentlySelectedPlaylist).player.stop();
+                    playlistList.get(currentlyPlayingPlaylist).player.stop();
                     return;
                 }
                 if (skip || jump) {
-                    playlist.get(currentlySelectedPlaylist).player.stop();
                     break;
                 }
-
+                Platform.runLater(() -> secondsLabel.setText(Double.toString(playlistList.get(currentlyPlayingPlaylist).player.getPlayingTimeSeconds())));
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(17);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return;
                 }
             }
             if (!jump) {
-                playlist.get(currentlySelectedPlaylist).nextSong();
+                playlistList.get(currentlyPlayingPlaylist).nextSong();
             } else {
                 jump = false;
             }
-            playlist.get(currentlySelectedPlaylist).loadCurrentIndex();
-            playlist.get(currentlySelectedPlaylist).playCurrentIndex();
         }
     }
 }
