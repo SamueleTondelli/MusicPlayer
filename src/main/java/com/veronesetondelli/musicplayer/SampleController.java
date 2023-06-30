@@ -59,12 +59,13 @@ public class SampleController implements Runnable{
         });
 
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("songListView " + oldValue.intValue() + " -> " + newValue.intValue());
             if (newValue.intValue() == -1) return;
             if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
                 if (!stop) {
+                    jump = true;
                     playlistList.get(currentlyPlayingPlaylist).player.stop();
                     playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
-                    jump = true;
                 } else {
                     playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
                     Thread t = new Thread(this);
@@ -77,24 +78,6 @@ public class SampleController implements Runnable{
                 playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
             }
         });
-    }
-
-    @FXML
-    protected void onLoadButtonClick() {
-        if (playlistList.size() == 0) {
-            Playlist p = new Playlist("p1");
-            p.addSong("C:\\Users\\samue\\Desktop\\wq-ost\\1-01 The Witch Queen.mp3");
-            p.addSong("C:\\Users\\samue\\Desktop\\wq-ost\\1-02 Lucent World.mp3");
-            playlistList.add(p);
-            currentPlaylistLabel.setText(p.name);
-            Thread t = new Thread(this);
-            t.start();
-        }
-        else if (stop) {
-            playlistList.get(currentlyPlayingPlaylist).index = 0;
-            Thread t = new Thread(this);
-            t.start();
-        }
     }
 
     @FXML
@@ -121,12 +104,6 @@ public class SampleController implements Runnable{
     }
 
     @FXML
-    void onStopButtonPress() {
-        btn.setText("pause");
-        stop = true;
-    }
-
-    @FXML
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -149,13 +126,6 @@ public class SampleController implements Runnable{
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    void onNextPlaylistButtonClick() {
-        currentlyPlayingPlaylist = (currentlyPlayingPlaylist + 1) % playlistList.size();
-        currentPlaylistLabel.setText(playlistList.get(currentlyPlayingPlaylist).name);
-        songListView.setItems(playlistList.get(currentlyPlayingPlaylist).getSongNames());
     }
 
     @FXML
@@ -239,7 +209,7 @@ public class SampleController implements Runnable{
             if (file != null) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.registerModule(new JavaTimeModule());
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlistList.get(currentlyPlayingPlaylist).songList);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlistList.get(currentlySelectedPlaylist).songList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -270,7 +240,7 @@ public class SampleController implements Runnable{
                 }
                 Platform.runLater(() -> secondsLabel.setText(Double.toString(playlistList.get(currentlyPlayingPlaylist).player.getPlayingTimeSeconds())));
                 try {
-                    Thread.sleep(17);
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

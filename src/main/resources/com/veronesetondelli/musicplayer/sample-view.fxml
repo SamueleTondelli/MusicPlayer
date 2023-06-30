@@ -7,16 +7,13 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.SampleController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.SampleController">
    <children>
       <Button layoutX="13.0" layoutY="174.0" mnemonicParsing="false" onAction="#onVolumeButtonClick" text="volume" />
-      <Button layoutX="69.0" layoutY="56.0" mnemonicParsing="false" onAction="#onNextPlaylistButtonClick" text="Next Playlist" />
       <Button layoutX="18.0" layoutY="23.0" mnemonicParsing="false" onAction="#handleCreatePlaylist" text="Create Playlist" />
       <Button fx:id="btn" layoutX="65.0" layoutY="139.0" mnemonicParsing="false" onAction="#onPlayButtonClick" text="pause" />
       <Button layoutX="17.0" layoutY="139.0" mnemonicParsing="false" onAction="#onSkipButtonPress" text="skip" />
-      <Button layoutX="88.0" layoutY="174.0" mnemonicParsing="false" onAction="#onStopButtonPress" text="stop" />
-      <Button layoutX="18.0" layoutY="56.0" onAction="#onLoadButtonClick" text="load" />
-      <Button layoutX="17.0" layoutY="88.0" mnemonicParsing="false" onAction="#handleAddSongClick" text="Add song" />
+      <Button layoutX="19.0" layoutY="69.0" mnemonicParsing="false" onAction="#handleAddSongClick" text="Add song" />
       <Button layoutX="126.0" layoutY="23.0" mnemonicParsing="false" onAction="#handlePlaylistFromFolder" text="Create Playlist from folder" />
       <Label fx:id="secondsLabel" layoutX="86.0" layoutY="307.0" text="0" />
       <Label layoutX="24.0" layoutY="307.0" text="Time:" />
