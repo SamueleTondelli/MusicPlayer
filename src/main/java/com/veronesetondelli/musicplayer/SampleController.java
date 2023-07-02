@@ -115,9 +115,9 @@ public class SampleController implements Runnable{
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-new-playlist-view.fxml"));
+            loader.setLocation(getClass().getResource("sample-edit-view.fxml"));
             DialogPane view = loader.load();
-            SampleNewPlaylistController controller = loader.getController();
+            SampleEditPlaylistController controller = loader.getController();
 
             controller.setPlaylist(new Playlist("name"));
 
@@ -158,31 +158,6 @@ public class SampleController implements Runnable{
         }
         else {
             getPlayingPlaylist().setVolume(0.0);
-        }
-    }
-
-    @FXML
-    void handlePlaylistFromFolder() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-playlist-from-folder-view.fxml"));
-            DialogPane view = loader.load();
-            SamplePlaylistFromFolderController controller = loader.getController();
-
-            controller.setPlaylist(new Playlist("name"));
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("New Playlist");
-            dialog.initModality(Modality.WINDOW_MODAL);
-            dialog.setDialogPane(view);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-            if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                playlistList.add(controller.getPlaylist());
-                playlistListTable.setItems(playlistList);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

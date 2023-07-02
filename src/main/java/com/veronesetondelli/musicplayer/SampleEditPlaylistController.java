@@ -4,9 +4,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class SampleEditPlaylistController {
     @FXML private TextField nameField;
@@ -25,12 +28,21 @@ public class SampleEditPlaylistController {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio files (*.wav, *.mp3)", "*.wav", "*.mp3"));
 
-            File file = fileChooser.showOpenDialog(null);
-            playlist.addSong(file.getAbsolutePath());
+            List<File> files = fileChooser.showOpenMultipleDialog(null);
+            files.stream().forEachOrdered(f -> playlist.addSong(f.getAbsolutePath()));
             update();
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Could not load song").showAndWait();
         }
+    }
+
+    @FXML
+    void onLoadFolderPress() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        File directory = chooser.showDialog(null);
+        if (directory == null) return;
+        Arrays.stream(directory.listFiles((dir, name) -> name.endsWith(".mp3") || name.endsWith(".wav"))).forEachOrdered(f -> playlist.addSong(f.getAbsolutePath()));
+        update();
     }
 
     @FXML

@@ -119,7 +119,7 @@ public class MusicPlayerController implements Runnable{
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-new-playlist-view.fxml"));
+            loader.setLocation(getClass().getResource("sample-new-playlist-view.fxml")); //!!!!!!!
             DialogPane view = loader.load();
             SampleNewPlaylistController controller = loader.getController();
 
@@ -142,7 +142,7 @@ public class MusicPlayerController implements Runnable{
     void handlePlaylistFromFolder() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-playlist-from-folder-view.fxml"));
+            loader.setLocation(getClass().getResource("sample-playlist-from-folder-view.fxml")); //!!!!!!
             DialogPane view = loader.load();
             SamplePlaylistFromFolderController controller = loader.getController();
 

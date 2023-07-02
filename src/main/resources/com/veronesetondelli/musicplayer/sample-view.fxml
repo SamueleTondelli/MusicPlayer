@@ -9,12 +9,11 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.SampleController">
    <children>
-      <Button layoutX="13.0" layoutY="174.0" mnemonicParsing="false" onAction="#onVolumeButtonClick" text="volume" />
+      <Button layoutX="17.0" layoutY="175.0" mnemonicParsing="false" onAction="#onVolumeButtonClick" text="volume" />
       <Button layoutX="18.0" layoutY="23.0" mnemonicParsing="false" onAction="#handleCreatePlaylist" text="Create Playlist" />
       <Button fx:id="btn" layoutX="65.0" layoutY="139.0" mnemonicParsing="false" onAction="#onPlayButtonClick" text="pause" />
       <Button layoutX="17.0" layoutY="139.0" mnemonicParsing="false" onAction="#onSkipButtonPress" text="skip" />
       <Button layoutX="19.0" layoutY="69.0" mnemonicParsing="false" onAction="#handleAddSongClick" text="Add song" />
-      <Button layoutX="126.0" layoutY="23.0" mnemonicParsing="false" onAction="#handlePlaylistFromFolder" text="Create Playlist from folder" />
       <Label fx:id="secondsLabel" layoutX="86.0" layoutY="307.0" text="0" />
       <Label layoutX="24.0" layoutY="307.0" text="Time:" />
       <Label layoutX="26.0" layoutY="283.0" text="Song:" />
@@ -22,7 +21,7 @@
       <Label layoutX="25.0" layoutY="259.0" text="Playlist:" />
       <Label fx:id="currentPlaylistLabel" layoutX="87.0" layoutY="255.0" />
       <Button layoutX="448.0" layoutY="23.0" mnemonicParsing="false" onAction="#handleSaveAsJSON" text="Save playlist as JSON" />
-      <Button layoutX="288.0" layoutY="23.0" mnemonicParsing="false" onAction="#handleLoadAsJSON" text="Load playlist from JSON" />
+      <Button layoutX="279.0" layoutY="23.0" mnemonicParsing="false" onAction="#handleLoadAsJSON" text="Load playlist from JSON" />
       <ListView fx:id="songListView" layoutX="376.0" layoutY="81.0" prefHeight="315.0" prefWidth="200.0" />
       <TableView fx:id="playlistListTable" layoutX="160.0" layoutY="81.0" prefHeight="315.0" prefWidth="200.0">
         <columns>
@@ -30,6 +29,6 @@
         </columns>
       </TableView>
       <Button layoutX="19.0" layoutY="103.0" mnemonicParsing="false" onAction="#onEditPlaylistButtonPress" text="Edit Playlist" />
-      <Button layoutX="109.0" layoutY="57.0" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" text="Remove Playlist" />
+      <Button layoutX="146.0" layoutY="23.0" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" text="Remove Playlist" />
    </children>
 </AnchorPane>
