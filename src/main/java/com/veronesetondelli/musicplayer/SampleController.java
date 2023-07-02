@@ -42,7 +42,7 @@ public class SampleController implements Runnable{
 
     @FXML
     void initialize() {
-        currentlyPlayingPlaylist = 0;
+        currentlyPlayingPlaylist = -1;
         playing = false;
         skip = false;
         stop = true;
@@ -64,13 +64,18 @@ public class SampleController implements Runnable{
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             System.out.println("songListView " + oldValue.intValue() + " -> " + newValue.intValue());
             if (newValue.intValue() == -1) return;
-            if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
+            if (currentlyPlayingPlaylist == -1) {
+                currentlyPlayingPlaylist = currentlySelectedPlaylist;
+                getSelectedPlaylist().index = newValue.intValue();
+                Thread t = new Thread(this);
+                t.start();
+            }  else if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
                 if (!stop) {
                     jump = true;
-                    getPlayingPlaylist().player.stop();
-                    getPlayingPlaylist().index = newValue.intValue();
+                    getSelectedPlaylist().player.stop();
+                    getSelectedPlaylist().index = newValue.intValue();
                 } else {
-                    getPlayingPlaylist().index = newValue.intValue();
+                    getSelectedPlaylist().index = newValue.intValue();
                     Thread t = new Thread(this);
                     t.start();
                 }
@@ -245,6 +250,23 @@ public class SampleController implements Runnable{
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    void onRemovePlaylistButtonPress() {
+        if (playlistList.size() == 0 || currentlySelectedPlaylist == -1) return;
+        if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
+            stop = true;
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        playlistList.remove(currentlySelectedPlaylist);
+        playlistListTable.setItems(playlistList);
+        playlistListTable.getSelectionModel().clearSelection();
+        songListView.setItems(null);
     }
 
     @Override
