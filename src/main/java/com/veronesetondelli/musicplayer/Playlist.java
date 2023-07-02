@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist{
@@ -33,10 +32,6 @@ public class Playlist{
     }
 
     public void addSongs(List<String> songs) { songList.addAll(songs); }
-
-    public void removeSong(String name) {
-        songList.remove(name);
-    }
 
     public void removeSong(int index) throws IndexOutOfBoundsException{ songList.remove(index); }
 
@@ -84,4 +79,12 @@ public class Playlist{
     public String getCurrentSong() {
         return songList.get(index);
     }
+
+    public void swapSongs(int i1, int i2) {
+        String s1 = songList.get(i1);
+        songList.set(i1, songList.get(i2));
+        songList.set(i2, s1);
+    }
+
+    public int getPlaylistLength() { return songList.size(); }
 }

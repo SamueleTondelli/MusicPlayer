@@ -53,9 +53,12 @@ public class SampleController implements Runnable{
         playlistListTable.setItems(playlistList);
 
         playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("playlistListTable " + oldValue.intValue() + " -> " + newValue.intValue());
             currentlySelectedPlaylist = newValue.intValue();
             songListView.getSelectionModel().clearSelection();
-            songListView.setItems(playlistList.get(currentlySelectedPlaylist).getSongNames());
+            if (currentlySelectedPlaylist != -1) {
+                songListView.setItems(getSelectedPlaylist().getSongNames());
+            }
         });
 
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
@@ -64,18 +67,18 @@ public class SampleController implements Runnable{
             if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
                 if (!stop) {
                     jump = true;
-                    playlistList.get(currentlyPlayingPlaylist).player.stop();
-                    playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+                    getPlayingPlaylist().player.stop();
+                    getPlayingPlaylist().index = newValue.intValue();
                 } else {
-                    playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+                    getPlayingPlaylist().index = newValue.intValue();
                     Thread t = new Thread(this);
                     t.start();
                 }
             } else {
                 jump = true;
-                playlistList.get(currentlyPlayingPlaylist).player.stop();
+                getPlayingPlaylist().player.stop();
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
-                playlistList.get(currentlyPlayingPlaylist).index = newValue.intValue();
+                getPlayingPlaylist().index = newValue.intValue();
             }
         });
     }
@@ -85,12 +88,12 @@ public class SampleController implements Runnable{
         if (stop) return;
         if (playing) {
             btn.setText("play");
-            playlistList.get(currentlyPlayingPlaylist).pause();
+            getPlayingPlaylist().pause();
             playing = false;
         }
         else {
             btn.setText("pause");
-            playlistList.get(currentlyPlayingPlaylist).playCurrentIndex();
+            getPlayingPlaylist().playCurrentIndex();
             playing = true;
         }
     }
@@ -99,7 +102,7 @@ public class SampleController implements Runnable{
     void onSkipButtonPress() {
         if (!stop) {
             skip = true;
-            playlistList.get(currentlyPlayingPlaylist).player.stop();
+            getPlayingPlaylist().player.stop();
         }
     }
 
@@ -135,8 +138,8 @@ public class SampleController implements Runnable{
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio files (*.wav, *.mp3)", "*.wav", "*.mp3"));
 
             File file = fileChooser.showOpenDialog(null);
-            playlistList.get(currentlyPlayingPlaylist).addSong(file.getAbsolutePath());
-            songListView.setItems(playlistList.get(currentlyPlayingPlaylist).getSongNames());
+            getPlayingPlaylist().addSong(file.getAbsolutePath());
+            songListView.setItems(getPlayingPlaylist().getSongNames());
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Could not load song").showAndWait();
         }
@@ -144,12 +147,12 @@ public class SampleController implements Runnable{
 
     @FXML
     void onVolumeButtonClick() {
-        double currVol = playlistList.get(currentlyPlayingPlaylist).getVolume();
+        double currVol = getPlayingPlaylist().getVolume();
         if (currVol < 1.0) {
-            playlistList.get(currentlyPlayingPlaylist).setVolume(currVol + 0.1);
+            getPlayingPlaylist().setVolume(currVol + 0.1);
         }
         else {
-            playlistList.get(currentlyPlayingPlaylist).setVolume(0.0);
+            getPlayingPlaylist().setVolume(0.0);
         }
     }
 
@@ -209,7 +212,35 @@ public class SampleController implements Runnable{
             if (file != null) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.registerModule(new JavaTimeModule());
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, playlistList.get(currentlySelectedPlaylist).songList);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, getSelectedPlaylist().songList);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void onEditPlaylistButtonPress() {
+        if (playlistListTable.getSelectionModel().getSelectedIndex() == -1) return;
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("sample-edit-view.fxml"));
+            DialogPane view = loader.load();
+            SampleEditPlaylistController controller = loader.getController();
+
+            int editingPlaylistIndex = currentlySelectedPlaylist;
+            if (editingPlaylistIndex == currentlyPlayingPlaylist) stop = true;
+            controller.setPlaylist(playlistList.get(editingPlaylistIndex));
+            controller.update();
+
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle("Edit Playlist");
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setDialogPane(view);
+            Optional<ButtonType> clickedButton = dialog.showAndWait();
+            if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                playlistList.set(editingPlaylistIndex, controller.getPlaylist());
+                playlistListTable.setItems(playlistList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -219,37 +250,40 @@ public class SampleController implements Runnable{
     @Override
     public void run() {
         while (true) {
-            playlistList.get(currentlyPlayingPlaylist).loadCurrentIndex();
-            playlistList.get(currentlyPlayingPlaylist).playCurrentIndex();
+            getPlayingPlaylist().loadCurrentIndex();
+            getPlayingPlaylist().playCurrentIndex();
             stop = false;
             playing = true;
-            System.out.println("Playing " + playlistList.get(currentlyPlayingPlaylist).getCurrentSongName() + " from " + playlistList.get(currentlyPlayingPlaylist).name + " (" + currentlyPlayingPlaylist + ")");
+            System.out.println("Playing " + getPlayingPlaylist().getCurrentSongName() + " from " + getPlayingPlaylist().name + " (" + currentlyPlayingPlaylist + ")");
             skip = false;
+            jump = false;
             Platform.runLater(() ->  {
-                currentSongLabel.setText(playlistList.get(currentlyPlayingPlaylist).getCurrentSongName());
+                currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName());
                 songListView.getSelectionModel().clearSelection();
             });
-            while (playlistList.get(currentlyPlayingPlaylist).player.isPlaying()) {
+            while (getPlayingPlaylist().player.isPlaying()) {
                 if (stop) {
                     playing = false;
-                    playlistList.get(currentlyPlayingPlaylist).player.stop();
+                    getPlayingPlaylist().player.stop();
                     return;
                 }
                 if (skip || jump) {
                     break;
                 }
-                Platform.runLater(() -> secondsLabel.setText(Double.toString(playlistList.get(currentlyPlayingPlaylist).player.getPlayingTimeSeconds())));
+                Platform.runLater(() -> secondsLabel.setText(Double.toString(getPlayingPlaylist().player.getPlayingTimeSeconds())));
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+            if (getPlayingPlaylist().getPlaylistLength() == 0) return;
             if (!jump) {
-                playlistList.get(currentlyPlayingPlaylist).nextSong();
-            } else {
-                jump = false;
+                getPlayingPlaylist().nextSong();
             }
         }
     }
+    
+    Playlist getSelectedPlaylist() { return playlistList.get(currentlySelectedPlaylist); }
+    Playlist getPlayingPlaylist() { return playlistList.get(currentlyPlayingPlaylist); }
 }

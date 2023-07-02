@@ -29,5 +29,6 @@
           <TableColumn fx:id="playlistNameColumn" prefWidth="199.20001220703125" text="Playlist" />
         </columns>
       </TableView>
+      <Button layoutX="19.0" layoutY="103.0" mnemonicParsing="false" onAction="#onEditPlaylistButtonPress" text="Edit Playlist" />
    </children>
 </AnchorPane>
