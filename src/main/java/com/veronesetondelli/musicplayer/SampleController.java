@@ -27,6 +27,7 @@ public class SampleController implements Runnable{
     private boolean skip;
     private boolean stop;
     private boolean jump;
+    private Thread t;
     @FXML
     private Label currentPlaylistLabel;
     @FXML
@@ -67,7 +68,7 @@ public class SampleController implements Runnable{
             if (currentlyPlayingPlaylist == -1) {
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
                 getSelectedPlaylist().index = newValue.intValue();
-                Thread t = new Thread(this);
+                t = new Thread(this);
                 t.start();
             }  else if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
                 if (!stop) {
@@ -76,7 +77,7 @@ public class SampleController implements Runnable{
                     getSelectedPlaylist().index = newValue.intValue();
                 } else {
                     getSelectedPlaylist().index = newValue.intValue();
-                    Thread t = new Thread(this);
+                    t = new Thread(this);
                     t.start();
                 }
             } else {
@@ -233,8 +234,9 @@ public class SampleController implements Runnable{
         if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
             stop = true;
             try {
-                Thread.sleep(100);
-            } catch (Exception e) {
+                t.join(150L);
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
