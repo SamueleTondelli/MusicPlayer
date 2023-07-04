@@ -76,7 +76,6 @@ public class MusicPlayerController implements Runnable{
         playlistListTable.setItems(playlistList);
 
         playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("playlistListTable " + oldValue.intValue() + " -> " + newValue.intValue());
             currentlySelectedPlaylist = newValue.intValue();
             songListView.getSelectionModel().clearSelection();
             if (currentlySelectedPlaylist != -1) {
@@ -85,7 +84,6 @@ public class MusicPlayerController implements Runnable{
         });
 
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("songListView " + oldValue.intValue() + " -> " + newValue.intValue());
             if (newValue.intValue() == -1) return;
             if (currentlyPlayingPlaylist == -1) {
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
@@ -110,11 +108,6 @@ public class MusicPlayerController implements Runnable{
             }
         });
 
-        songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            getPlayingPlaylist().index = newValue.intValue();
-            jump = true;
-        });
-
         volumeSlider.setValue(volumeSlider.getMax());
 
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -128,8 +121,8 @@ public class MusicPlayerController implements Runnable{
     protected void onLoadButtonClick() {
         if (playlistList.size() == 0) {
             Playlist p = new Playlist("p1");
-            p.addSong("C:\\Users\\veron\\Desktop\\playlist\\chepalle.wav");
-            p.addSong("C:\\Users\\veron\\Desktop\\playlist\\vecchio.wav");
+            p.addSong("C:\\Users\\samue\\Desktop\\songs\\chepalle.wav");
+            p.addSong("C:\\Users\\samue\\Desktop\\songs\\vecchio.wav");
             playlistList.add(p);
             //currentlyPlayingPlaylist = 0;
             //currentPlaylistLabel.setText(p.name);
@@ -292,9 +285,7 @@ public class MusicPlayerController implements Runnable{
     Playlist getSelectedPlaylist() { return playlistList.get(currentlySelectedPlaylist); }
     @Override
     public void run() {
-        System.out.println("Called");
         while (true) {
-            System.out.println("index " + getPlayingPlaylist().index);
             getPlayingPlaylist().loadCurrentIndex();
             getPlayingPlaylist().playCurrentIndex();
             stop = false;
@@ -334,6 +325,8 @@ public class MusicPlayerController implements Runnable{
                     return;
                 }
             }
+            System.out.println("Exited loop with stop " + stop + ", playing " + playing + ", skip " + skip + ", " +
+                    "previous " + previous + ", jump " + jump);
             if (getPlayingPlaylist().getPlaylistLength() == 0) return;
             if (!jump) {
                 getPlayingPlaylist().nextSong();
