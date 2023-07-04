@@ -9,6 +9,8 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -21,12 +23,13 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handleSaveAsJSON" text="Save playlist as JSON" />
               <MenuItem mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#handleSaveAsJSON" text="Save playlist as JSON" />
+                  <MenuItem mnemonicParsing="false" text="Edit playlist" />
                   <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
@@ -41,12 +44,9 @@
    <left>
       <AnchorPane prefHeight="374.0" prefWidth="202.0" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="162.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.leftAnchor="14.0" />
-            <Button layoutX="14.0" layoutY="68.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleAddSongClick" prefHeight="45.0" prefWidth="130.0" text="Add Song" />
-            <MenuButton layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Add Playlist" AnchorPane.topAnchor="14.0">
+            <MenuButton layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Add Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleCreatePlaylist" text="New" />
-                <MenuItem mnemonicParsing="false" onAction="#handlePlaylistFromFolder" text="From Folder" />
                   <MenuItem mnemonicParsing="false" onAction="#handleLoadAsJSON" text="From JSON" />
               </items>
                <graphic>
@@ -61,7 +61,13 @@
                   </HBox>
                </graphic>
             </MenuButton>
-            <Label fx:id="currentSongProgress" layoutX="14.0" layoutY="212.0" text="debug" />
+            <TableView fx:id="playlistListTable" layoutX="14.0" layoutY="173.0" prefHeight="91.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="173.0">
+              <columns>
+                <TableColumn fx:id="playlistNameColumn" prefWidth="174.4" text="PLAYLIST" />
+              </columns>
+            </TableView>
+            <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Remove PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <Button layoutX="14.0" layoutY="120.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Edit PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
          </children>
       </AnchorPane>
    </left>
@@ -74,11 +80,12 @@
                </cursor></Slider>
             <Button fx:id="muteBtn" contentDisplay="CENTER" layoutX="339.0" layoutY="25.0" mnemonicParsing="false" onAction="#onMuteButtonClick" text="Mute" textAlignment="JUSTIFY" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="107.0" layoutY="29.0" text="volume" AnchorPane.rightAnchor="251.40000000000003" AnchorPane.topAnchor="19.0" />
-            <ListView fx:id="songListView" layoutY="76.0" prefHeight="200.0" prefWidth="397.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="202.0" AnchorPane.topAnchor="68.0">
+            <ListView fx:id="songListView" layoutY="76.0" prefHeight="200.0" prefWidth="397.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="272.0" AnchorPane.topAnchor="68.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ListView>
+            <Button layoutX="260.0" layoutY="233.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.rightAnchor="23.200000000000017" />
          </children>
       </AnchorPane>
    </center>

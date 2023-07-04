@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
@@ -39,6 +40,7 @@ public class MusicPlayerController implements Runnable{
     private boolean updateProgressBar;
     private boolean jump;
     private double currVol;
+    private Thread t;
     @FXML
     private Slider volumeSlider;
     @FXML
@@ -53,6 +55,10 @@ public class MusicPlayerController implements Runnable{
     private Slider songProgressSlider;
     @FXML
     private ListView<String> songListView;
+    @FXML
+    private TableView<Playlist> playlistListTable;
+    @FXML
+    private TableColumn<Playlist, String> playlistNameColumn;
 
     @FXML
     void initialize() {
@@ -66,6 +72,43 @@ public class MusicPlayerController implements Runnable{
         jump = false;
 
         playlistList = FXCollections.observableArrayList();
+        playlistNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        playlistListTable.setItems(playlistList);
+
+        playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("playlistListTable " + oldValue.intValue() + " -> " + newValue.intValue());
+            currentlySelectedPlaylist = newValue.intValue();
+            songListView.getSelectionModel().clearSelection();
+            if (currentlySelectedPlaylist != -1) {
+                songListView.setItems(getSelectedPlaylist().getSongNames());
+            }
+        });
+
+        songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("songListView " + oldValue.intValue() + " -> " + newValue.intValue());
+            if (newValue.intValue() == -1) return;
+            if (currentlyPlayingPlaylist == -1) {
+                currentlyPlayingPlaylist = currentlySelectedPlaylist;
+                getSelectedPlaylist().index = newValue.intValue();
+                t = new Thread(this);
+                t.start();
+            }  else if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
+                if (!stop) {
+                    jump = true;
+                    getSelectedPlaylist().player.stop();
+                    getSelectedPlaylist().index = newValue.intValue();
+                } else {
+                    getSelectedPlaylist().index = newValue.intValue();
+                    t = new Thread(this);
+                    t.start();
+                }
+            } else {
+                jump = true;
+                getPlayingPlaylist().player.stop();
+                currentlyPlayingPlaylist = currentlySelectedPlaylist;
+                getPlayingPlaylist().index = newValue.intValue();
+            }
+        });
 
         songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             getPlayingPlaylist().index = newValue.intValue();
@@ -85,18 +128,14 @@ public class MusicPlayerController implements Runnable{
     protected void onLoadButtonClick() {
         if (playlistList.size() == 0) {
             Playlist p = new Playlist("p1");
-            p.addSong("C:\\Users\\samue\\Desktop\\songs\\chepalle.wav");
-            p.addSong("C:\\Users\\samue\\Desktop\\songs\\vecchio.wav");
+            p.addSong("C:\\Users\\veron\\Desktop\\playlist\\chepalle.wav");
+            p.addSong("C:\\Users\\veron\\Desktop\\playlist\\vecchio.wav");
             playlistList.add(p);
-            currentlyPlayingPlaylist = 0;
+            //currentlyPlayingPlaylist = 0;
             //currentPlaylistLabel.setText(p.name);
-            Thread t = new Thread(this);
-            t.start();
-        }
-        else if (stop) {
-            getPlayingPlaylist().index = 0;
-            Thread t = new Thread(this);
-            t.start();
+            //t = new Thread(this);
+
+            //t.start();
         }
     }
     @FXML
@@ -253,24 +292,29 @@ public class MusicPlayerController implements Runnable{
     Playlist getSelectedPlaylist() { return playlistList.get(currentlySelectedPlaylist); }
     @Override
     public void run() {
+        System.out.println("Called");
         while (true) {
+            System.out.println("index " + getPlayingPlaylist().index);
             getPlayingPlaylist().loadCurrentIndex();
             getPlayingPlaylist().playCurrentIndex();
             stop = false;
             playing = true;
             skip = false;
             previous = false;
+            jump = false;
             getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
 
-            Platform.runLater(() -> currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName()));
-
+            Platform.runLater(() -> {
+                currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName());
+                songListView.getSelectionModel().clearSelection();
+            });
             while (getPlayingPlaylist().player.isPlaying()) {
                 if (updateProgressBar) {
                     Platform.runLater(() -> {
                             songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
                             secondsLabel.setText(Double.toString(getPlayingPlaylist().player.getPlayingTimeSeconds()));
                             volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
-                            currentSongProgress.setText(Double.toString(getPlayingPlaylist().getCurrentSongProgress()));
+                            //currentSongProgress.setText(Double.toString(getPlayingPlaylist().getCurrentSongProgress()));
                         });
                 }
                 if (stop) {
