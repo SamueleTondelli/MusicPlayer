@@ -43,7 +43,7 @@
    <left>
       <AnchorPane prefHeight="374.0" prefWidth="202.0" BorderPane.alignment="CENTER">
          <children>
-            <MenuButton layoutX="14.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Add Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+            <MenuButton layoutX="14.0" layoutY="56.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Add Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleCreatePlaylist" text="New" />
                   <MenuItem mnemonicParsing="false" onAction="#handleLoadAsJSON" text="From JSON" />
@@ -62,11 +62,25 @@
             </MenuButton>
             <TableView fx:id="playlistListTable" layoutX="14.0" layoutY="173.0" prefHeight="91.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="173.0">
               <columns>
-                <TableColumn fx:id="playlistNameColumn" prefWidth="174.4" text="PLAYLIST" />
+                <TableColumn fx:id="playlistNameColumn" prefWidth="174.4" text="Playlist" />
               </columns>
             </TableView>
-            <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Remove PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-            <Button layoutX="14.0" layoutY="120.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onEditPlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Edit PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Remove Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+               <graphic>
+                  <ImageView fitHeight="18.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@close.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+            <Button layoutX="14.0" layoutY="120.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onEditPlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Edit Playlist" textAlignment="CENTER" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+               <graphic>
+                  <ImageView fitHeight="64.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@options.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
          </children>
       </AnchorPane>
    </left>
