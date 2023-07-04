@@ -29,7 +29,6 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
-                  <MenuItem mnemonicParsing="false" text="Edit playlist" />
                   <MenuItem mnemonicParsing="false" text="Delete" />
             </items>
           </Menu>
@@ -66,8 +65,8 @@
                 <TableColumn fx:id="playlistNameColumn" prefWidth="174.4" text="PLAYLIST" />
               </columns>
             </TableView>
-            <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Remove PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-            <Button layoutX="14.0" layoutY="120.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Edit PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Remove PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <Button layoutX="14.0" layoutY="120.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onEditPlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Edit PLaylist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
          </children>
       </AnchorPane>
    </left>
@@ -80,12 +79,12 @@
                </cursor></Slider>
             <Button fx:id="muteBtn" contentDisplay="CENTER" layoutX="339.0" layoutY="25.0" mnemonicParsing="false" onAction="#onMuteButtonClick" text="Mute" textAlignment="JUSTIFY" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="107.0" layoutY="29.0" text="volume" AnchorPane.rightAnchor="251.40000000000003" AnchorPane.topAnchor="19.0" />
-            <ListView fx:id="songListView" layoutY="76.0" prefHeight="200.0" prefWidth="397.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="70.0" AnchorPane.rightAnchor="272.0" AnchorPane.topAnchor="68.0">
+            <ListView fx:id="songListView" layoutY="76.0" prefHeight="200.0" prefWidth="397.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="68.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ListView>
-            <Button layoutX="260.0" layoutY="233.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.rightAnchor="23.200000000000017" />
+            <Button layoutY="15.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0" />
          </children>
       </AnchorPane>
    </center>
@@ -114,7 +113,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="254.0" layoutY="15.0" mnemonicParsing="false" onAction="#onPreviousButtonPress" AnchorPane.bottomAnchor="32.0">
+            <Button layoutX="254.0" layoutY="15.0" mnemonicParsing="false" onAction="#onPreviousButtonPress" prefHeight="36.0" prefWidth="40.0" AnchorPane.bottomAnchor="32.0">
                <graphic>
                   <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -123,7 +122,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Label fx:id="secondsLabel" layoutX="562.0" layoutY="57.0" prefHeight="18.0" prefWidth="32.0" text="0" />
+            <Label fx:id="secondsLabel" layoutX="121.0" layoutY="57.0" prefHeight="18.0" prefWidth="41.0" text="0" />
             <Label fx:id="currentSongLabel" alignment="CENTER" layoutX="257.0" layoutY="5.0" prefHeight="18.0" prefWidth="186.0" text="song" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="257.0" AnchorPane.rightAnchor="257.0" />
          </children>
       </AnchorPane>
