@@ -3,11 +3,10 @@ package com.veronesetondelli.musicplayer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 public class Playlist{
-    ObservableList<String> songList;
+    ObservableList<Song> songList;
     AudioPlayer player;
     int index;
     String name;
@@ -27,11 +26,11 @@ public class Playlist{
         this.name = name;
     }
 
-    public void addSong(String name) {
-        songList.add(name);
+    public void addSong(String filePath) {
+        songList.add(new Song(filePath));
     }
 
-    public void addSongs(List<String> songs) { songList.addAll(songs); }
+    public void addSongs(List<String> songs) { songs.forEach(s -> songList.add(new Song(s)));}
 
     public void removeSong(int index) throws IndexOutOfBoundsException{ songList.remove(index); }
 
@@ -61,7 +60,7 @@ public class Playlist{
     }
 
     public String getCurrentSongName() {
-        return Paths.get(songList.get(index)).getFileName().toString();
+        return songList.get(index).getName();
     }
 
     public double getCurrentSongProgress() { return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100; }
@@ -70,18 +69,14 @@ public class Playlist{
 
     public ObservableList<String> getSongNames() {
         ObservableList<String> names = FXCollections.observableArrayList();
-        for (String s : songList) {
-            names.add(Paths.get(s).getFileName().toString());
+        for (Song s : songList) {
+            names.add(s.getName());
         }
         return names;
     }
 
-    public String getCurrentSong() {
-        return songList.get(index);
-    }
-
     public void swapSongs(int i1, int i2) {
-        String s1 = songList.get(i1);
+        Song s1 = songList.get(i1);
         songList.set(i1, songList.get(i2));
         songList.set(i2, s1);
     }

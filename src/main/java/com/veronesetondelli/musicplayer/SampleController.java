@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
@@ -87,6 +89,17 @@ public class SampleController implements Runnable{
                 getPlayingPlaylist().index = newValue.intValue();
             }
         });
+        songListView.setCellFactory(cell -> {return new ListCell<String>(){
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item);
+                }
+                setFont(Font.font(16));
+                cell.setFixedCellSize(45);
+            }
+        };});
     }
 
     @FXML

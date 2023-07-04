@@ -14,15 +14,12 @@ public class AudioPlayer {
     private MediaPlayer mediaPlayer;
     private Timer timer;
     private TimerTask task;
-    String name;
 
     AudioPlayer () { playing = false;}
 
-    public void loadAudioFile(String fileName) {
+    public void loadAudioFile(Song song) {
         try {
-            name = fileName;
-            File file = new File(fileName);
-            media = new Media(file.toURI().toString());
+            media = song.getMedia();
             mediaPlayer = new MediaPlayer(media);
         } catch (Exception e) {
             e.printStackTrace();
