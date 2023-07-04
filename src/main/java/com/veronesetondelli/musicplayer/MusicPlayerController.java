@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
@@ -40,6 +41,8 @@ public class MusicPlayerController implements Runnable{
     private boolean updateProgressBar;
     private boolean jump;
     private double currVol;
+    private final double CELL_SIZE = 30;
+    private final double FONT_SIZE = 14;
     private Thread t;
     @FXML
     private Slider volumeSlider;
@@ -109,7 +112,17 @@ public class MusicPlayerController implements Runnable{
             }
         });
 
-
+        songListView.setCellFactory(cell -> {return new ListCell<String>(){
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item);
+                }
+                setFont(Font.font(FONT_SIZE));
+                cell.setFixedCellSize(CELL_SIZE);
+            }
+        };});
 
         volumeSlider.setValue(volumeSlider.getMax());
 
@@ -162,9 +175,9 @@ public class MusicPlayerController implements Runnable{
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-new-playlist-view.fxml")); //!!!!!!!
+            loader.setLocation(getClass().getResource("sample-edit-view.fxml"));
             DialogPane view = loader.load();
-            SampleNewPlaylistController controller = loader.getController();
+            SampleEditPlaylistController controller = loader.getController();
 
             controller.setPlaylist(new Playlist("name"));
 
@@ -176,6 +189,7 @@ public class MusicPlayerController implements Runnable{
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 playlistList.add(controller.getPlaylist());
+                playlistListTable.setItems(playlistList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -333,7 +347,9 @@ public class MusicPlayerController implements Runnable{
                 if (updateProgressBar) {
                     Platform.runLater(() -> {
                             songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
-                            secondsLabel.setText(Double.toString(getPlayingPlaylist().player.getPlayingTimeSeconds()));
+                            secondsLabel.setText(String.format("%d:%02d",
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() / 60,
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() % 60));
                             volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
                         });
                 }
