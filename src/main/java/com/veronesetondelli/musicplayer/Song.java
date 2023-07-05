@@ -38,7 +38,6 @@ public class Song {
             input.close();
             if (parser instanceof Mp3Parser) duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
             else duration = -1;
-            System.out.println(Arrays.toString(metadata.names()));
             artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
             metadataHasBeenLoaded = true;
         } catch (Exception e) {
