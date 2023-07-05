@@ -15,14 +15,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
 public class MusicPlayerController implements Runnable{
-    @FXML
-    private Button btnPlay;
 
     @FXML
     private Button muteBtn;
@@ -41,15 +40,9 @@ public class MusicPlayerController implements Runnable{
     private boolean updateProgressBar;
     private boolean jump;
     private double currVol;
-    private final double CELL_SIZE = 30;
-    private final double FONT_SIZE = 14;
     private Thread t;
     @FXML
     private Slider volumeSlider;
-    @FXML
-    private Label currentPlaylistLabel;
-    @FXML
-    private Label currentSongProgress;
     @FXML
     private Label currentSongLabel;
     @FXML
@@ -57,12 +50,17 @@ public class MusicPlayerController implements Runnable{
     @FXML
     private Slider songProgressSlider;
     @FXML
-    private ListView<String> songListView;
-    @FXML
     private TableView<Playlist> playlistListTable;
     @FXML
     private TableColumn<Playlist, String> playlistNameColumn;
-
+    @FXML
+    private TableView<Song> songTableView;
+    @FXML
+    private TableColumn<Song, String> titleColumn;
+    @FXML
+    private TableColumn<Song, String> artistColumn;
+    @FXML
+    private TableColumn<Song, String> lengthColumn;
 
     @FXML
     void initialize() {
@@ -81,13 +79,21 @@ public class MusicPlayerController implements Runnable{
 
         playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             currentlySelectedPlaylist = newValue.intValue();
-            songListView.getSelectionModel().clearSelection();
+            songTableView.getSelectionModel().clearSelection();
             if (currentlySelectedPlaylist != -1) {
-                songListView.setItems(getSelectedPlaylist().getSongNames());
+                songTableView.setItems(getSelectedPlaylist().getSongList());
+                Thread t1 = new Thread(() -> {
+                    getSelectedPlaylist().loadMetadata();
+                    songTableView.refresh();
+                });
+                t1.start();
             }
         });
 
-        songListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
+        artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
+        lengthColumn.setCellValueFactory(new PropertyValueFactory<>("durationFormatted"));
+        songTableView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.intValue() == -1) return;
             if (currentlyPlayingPlaylist == -1) {
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
@@ -112,26 +118,8 @@ public class MusicPlayerController implements Runnable{
             }
         });
 
-        songListView.setCellFactory(cell -> {return new ListCell<String>(){
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null) {
-                    setText(item);
-                }
-                setFont(Font.font(FONT_SIZE));
-                cell.setFixedCellSize(CELL_SIZE);
-            }
-        };});
-
         volumeSlider.setValue(volumeSlider.getMax());
-
-        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
-            }
-        });
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> getPlayingPlaylist().setVolume(newValue.doubleValue() * 0.01));
     }
     @FXML
     protected void onLoadButtonClick() {
@@ -167,11 +155,6 @@ public class MusicPlayerController implements Runnable{
         }
     }
     @FXML
-    void onStopButtonPress() {
-        //btn.setText("pause");
-        stop = true;
-    }
-    @FXML
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -194,35 +177,6 @@ public class MusicPlayerController implements Runnable{
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    @FXML
-    void handlePlaylistFromFolder() {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-playlist-from-folder-view.fxml")); //!!!!!!
-            DialogPane view = loader.load();
-            SamplePlaylistFromFolderController controller = loader.getController();
-
-            controller.setPlaylist(new Playlist("name"));
-
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle("New Playlist");
-            dialog.initModality(Modality.WINDOW_MODAL);
-            dialog.setDialogPane(view);
-
-            Optional<ButtonType> clickedButton = dialog.showAndWait();
-            if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                playlistList.add(controller.getPlaylist());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    @FXML
-    void onNextPlaylistButtonClick() {
-        currentlyPlayingPlaylist = (currentlyPlayingPlaylist + 1) % playlistList.size();
-        currentPlaylistLabel.setText(getPlayingPlaylist().name);
-        songListView.setItems(getPlayingPlaylist().getSongNames());
     }
     @FXML
     void handleLoadAsJSON() {
@@ -253,7 +207,7 @@ public class MusicPlayerController implements Runnable{
             if (file != null) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.registerModule(new JavaTimeModule());
-                mapper.writerWithDefaultPrettyPrinter().writeValue(file, getSelectedPlaylist().songList);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, getSelectedPlaylist().getSongsPathList());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -301,7 +255,7 @@ public class MusicPlayerController implements Runnable{
         playlistList.remove(currentlySelectedPlaylist);
         playlistListTable.setItems(playlistList);
         playlistListTable.getSelectionModel().clearSelection();
-        songListView.setItems(null);
+        songTableView.setItems(null);
     }
     @FXML
     void onMuteButtonClick() {
@@ -341,7 +295,7 @@ public class MusicPlayerController implements Runnable{
 
             Platform.runLater(() -> {
                 currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName().substring(0, getPlayingPlaylist().getCurrentSongName().length() - 4));
-                songListView.getSelectionModel().clearSelection();
+                songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().player.isPlaying()) {
                 if (updateProgressBar) {
@@ -370,8 +324,6 @@ public class MusicPlayerController implements Runnable{
                     return;
                 }
             }
-            System.out.println("Exited loop with stop " + stop + ", playing " + playing + ", skip " + skip + ", " +
-                    "previous " + previous + ", jump " + jump);
             if (getPlayingPlaylist().getPlaylistLength() == 0) return;
             if (!jump) {
                 getPlayingPlaylist().nextSong();

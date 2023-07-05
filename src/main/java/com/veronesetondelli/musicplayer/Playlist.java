@@ -3,6 +3,7 @@ package com.veronesetondelli.musicplayer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist{
@@ -25,6 +26,7 @@ public class Playlist{
     public void setName(String name) {
         this.name = name;
     }
+    public ObservableList<Song> getSongList() {return songList; }
 
     public void addSong(String filePath) {
         songList.add(new Song(filePath));
@@ -60,7 +62,7 @@ public class Playlist{
     }
 
     public String getCurrentSongName() {
-        return songList.get(index).getName();
+        return songList.get(index).getFileName();
     }
 
     public double getCurrentSongProgress() { return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100; }
@@ -70,7 +72,7 @@ public class Playlist{
     public ObservableList<String> getSongNames() {
         ObservableList<String> names = FXCollections.observableArrayList();
         for (Song s : songList) {
-            names.add(s.getName());
+            names.add(s.getFileName());
         }
         return names;
     }
@@ -82,4 +84,14 @@ public class Playlist{
     }
 
     public int getPlaylistLength() { return songList.size(); }
+
+    public void loadMetadata() {
+        songList.stream().filter(s -> !s.getMetadataHasBeenLoaded()).forEach(Song::loadMetadata);
+    }
+
+    public List<String> getSongsPathList() {
+        List<String> l = new ArrayList<>();
+        songList.forEach(s -> l.add(s.getFilePath()));
+        return l;
+    }
 }

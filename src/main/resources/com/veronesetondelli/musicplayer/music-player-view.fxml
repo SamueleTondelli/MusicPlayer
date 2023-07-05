@@ -61,7 +61,7 @@
             </MenuButton>
             <TableView fx:id="playlistListTable" layoutX="14.0" layoutY="173.0" prefHeight="91.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="173.0">
               <columns>
-                <TableColumn fx:id="playlistNameColumn" prefWidth="174.4" text="Playlist" />
+                <TableColumn fx:id="playlistNameColumn" editable="false" prefWidth="174.4" sortable="false" text="Playlist" />
               </columns>
             </TableView>
             <Button layoutX="14.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onRemovePlaylistButtonPress" prefHeight="45.0" prefWidth="130.0" text="Remove Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
@@ -93,11 +93,11 @@
             <Button fx:id="muteBtn" contentDisplay="CENTER" layoutX="339.0" layoutY="25.0" mnemonicParsing="false" onAction="#onMuteButtonClick" text="Mute" textAlignment="JUSTIFY" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="107.0" layoutY="29.0" text="volume" AnchorPane.rightAnchor="251.40000000000003" AnchorPane.topAnchor="19.0" />
             <Button layoutY="15.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0" />
-            <TableView layoutX="7.0" layoutY="62.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="14.0">
+            <TableView fx:id="songTableView" layoutX="7.0" layoutY="62.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="14.0">
               <columns>
-                <TableColumn prefWidth="75.0" text="Titolo" />
-                <TableColumn prefWidth="75.0" text="Artista" />
-                  <TableColumn prefWidth="75.0" text="Durata" />
+                <TableColumn fx:id="titleColumn" editable="false" prefWidth="75.0" sortable="false" text="Titolo" />
+                <TableColumn fx:id="artistColumn" editable="false" prefWidth="75.0" sortable="false" text="Artista" />
+                  <TableColumn fx:id="lengthColumn" editable="false" prefWidth="75.0" sortable="false" text="Durata" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
