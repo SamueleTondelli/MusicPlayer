@@ -41,6 +41,7 @@ public class MusicPlayerController implements Runnable{
     private boolean jump;
     private double currVol;
     private Thread t;
+    private Thread metadataLoaderThread;
     @FXML
     private Slider volumeSlider;
     @FXML
@@ -82,11 +83,6 @@ public class MusicPlayerController implements Runnable{
             songTableView.getSelectionModel().clearSelection();
             if (currentlySelectedPlaylist != -1) {
                 songTableView.setItems(getSelectedPlaylist().getSongList());
-                Thread t1 = new Thread(() -> {
-                    getSelectedPlaylist().loadMetadata();
-                    songTableView.refresh();
-                });
-                t1.start();
             }
         });
 
@@ -128,6 +124,15 @@ public class MusicPlayerController implements Runnable{
             p.addSong("C:\\Users\\veron\\Desktop\\playlist\\chepalle.wav");
             p.addSong("C:\\Users\\veron\\Desktop\\playlist\\vecchio.wav");
             playlistList.add(p);
+            metadataLoaderThread = new Thread(() -> {
+                Long begin = System.nanoTime();
+                p.loadMetadata();
+                Long end = System.nanoTime();
+                System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " " +
+                        "ms");
+                songTableView.refresh();
+            });
+            metadataLoaderThread.start();
         }
     }
     @FXML
@@ -171,8 +176,17 @@ public class MusicPlayerController implements Runnable{
 
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                playlistList.add(controller.getPlaylist());
+                Playlist p = controller.getPlaylist();
+                playlistList.add(p);
                 playlistListTable.setItems(playlistList);
+                metadataLoaderThread = new Thread(() -> {
+                    Long begin = System.nanoTime();
+                    p.loadMetadata();
+                    Long end = System.nanoTime();
+                    System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
+                    songTableView.refresh();
+                });
+                metadataLoaderThread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,6 +206,14 @@ public class MusicPlayerController implements Runnable{
                 Playlist p = new Playlist(file.getName().substring(0, file.getName().length() - 5));
                 p.addSongs(songs);
                 playlistList.add(p);
+                metadataLoaderThread = new Thread(() -> {
+                    Long begin = System.nanoTime();
+                    p.loadMetadata();
+                    Long end = System.nanoTime();
+                    System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
+                    songTableView.refresh();
+                });
+                metadataLoaderThread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,6 +257,14 @@ public class MusicPlayerController implements Runnable{
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 playlistList.set(editingPlaylistIndex, controller.getPlaylist());
                 playlistListTable.setItems(playlistList);
+                metadataLoaderThread = new Thread(() -> {
+                    Long begin = System.nanoTime();
+                    playlistList.get(editingPlaylistIndex).loadMetadata();
+                    Long end = System.nanoTime();
+                    System.out.println("Loading " + playlistList.get(editingPlaylistIndex).getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
+                    songTableView.refresh();
+                });
+                metadataLoaderThread.start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -247,6 +277,14 @@ public class MusicPlayerController implements Runnable{
             stop = true;
             try {
                 t.join(150L);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (metadataLoaderThread != null) {
+            try {
+                metadataLoaderThread.join(3000L);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -298,15 +336,6 @@ public class MusicPlayerController implements Runnable{
                 songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().player.isPlaying()) {
-                if (updateProgressBar) {
-                    Platform.runLater(() -> {
-                            songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
-                            secondsLabel.setText(String.format("%d:%02d",
-                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() / 60,
-                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() % 60));
-                            volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
-                        });
-                }
                 if (stop) {
                     playing = false;
                     getPlayingPlaylist().player.stop();
@@ -315,6 +344,15 @@ public class MusicPlayerController implements Runnable{
                 if (skip || jump || previous) {
                     getPlayingPlaylist().player.stop();
                     break;
+                }
+                if (updateProgressBar) {
+                    Platform.runLater(() -> {
+                        songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
+                        secondsLabel.setText(String.format("%d:%02d",
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() / 60,
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() % 60));
+                        volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
+                    });
                 }
 
                 try {

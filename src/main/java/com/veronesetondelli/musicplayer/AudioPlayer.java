@@ -21,6 +21,7 @@ public class AudioPlayer {
     public void loadAudioFile(Song song) {
         try {
             media = song.getMedia();
+            if (mediaPlayer != null) mediaPlayer.dispose();
             mediaPlayer = new MediaPlayer(media);
         } catch (Exception e) {
             e.printStackTrace();

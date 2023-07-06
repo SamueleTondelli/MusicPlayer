@@ -1,6 +1,7 @@
 package com.veronesetondelli.musicplayer;
 
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import org.apache.tika.metadata.Metadata;
 import org.xml.sax.ContentHandler;
 import org.apache.tika.parser.ParseContext;
@@ -29,24 +30,28 @@ public class Song {
 
     public String getFilePath() { return fileLocation + System.getProperty("file.separator") + fileName; }
     public void loadMetadata(){
-        try (InputStream input = new FileInputStream(getFilePath())) {
-            ContentHandler handler = new DefaultHandler();
-            Metadata metadata = new Metadata();
-            Parser parser = fileName.endsWith("mp3") ? new Mp3Parser() : new AudioParser();
-            ParseContext parseCtx = new ParseContext();
-            parser.parse(input, handler, metadata, parseCtx);
-            input.close();
-            if (parser instanceof Mp3Parser) duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
-            else duration = -1;
-            artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
+        if (fileName.endsWith("wav")) {
+            duration = -1;
+            artist = "Unknown";
             metadataHasBeenLoaded = true;
+            return;
+        }
+        try (InputStream input = new FileInputStream(getFilePath())) {
+               ContentHandler handler = new DefaultHandler();
+               Metadata metadata = new Metadata();
+               Parser parser = new Mp3Parser();
+               ParseContext parseCtx = new ParseContext();
+               parser.parse(input, handler, metadata, parseCtx);
+               duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
+               artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
+               metadataHasBeenLoaded = true;
         } catch (Exception e) {
-            e.printStackTrace();
+           e.printStackTrace();
         }
     }
 
     public Media getMedia() {
-        File f = new File(fileLocation + System.getProperty("file.separator") + fileName);
+        File f = new File(getFilePath());
         return new Media(f.toURI().toString());
     }
 

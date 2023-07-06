@@ -2,15 +2,20 @@ package com.veronesetondelli.musicplayer;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Playlist{
     ObservableList<Song> songList;
     AudioPlayer player;
     int index;
     String name;
+    private final int NUMBER_LOADER_THREADS = 4;
 
     public Playlist(String name) {
         index = 0;
@@ -84,11 +89,22 @@ public class Playlist{
     }
 
     public int getPlaylistLength() { return songList.size(); }
-
     public void loadMetadata() {
-        songList.stream().filter(s -> !s.getMetadataHasBeenLoaded()).forEach(Song::loadMetadata);
+        ExecutorService executor = Executors.newFixedThreadPool(NUMBER_LOADER_THREADS);
+        songList.stream().filter(s -> !s.getMetadataHasBeenLoaded()).forEach(s -> executor.execute(s::loadMetadata));
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Error loading metadata");
+                alert.setHeaderText("Error loading metadata");
+                alert.setContentText("Error loading metadata, timed out.");
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
     public List<String> getSongsPathList() {
         List<String> l = new ArrayList<>();
         songList.forEach(s -> l.add(s.getFilePath()));
