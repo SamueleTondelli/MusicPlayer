@@ -228,7 +228,7 @@ public class MusicPlayerController implements Runnable{
 
             int editingPlaylistIndex = currentlySelectedPlaylist;
             if (editingPlaylistIndex == currentlyPlayingPlaylist) stop = true;
-            controller.setPlaylist(playlistList.get(editingPlaylistIndex));
+            controller.setPlaylist(new Playlist(playlistList.get(editingPlaylistIndex)));
             controller.update();
 
             Dialog<ButtonType> dialog = new Dialog<>();

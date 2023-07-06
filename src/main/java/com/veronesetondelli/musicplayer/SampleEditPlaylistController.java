@@ -2,8 +2,10 @@ package com.veronesetondelli.musicplayer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -13,12 +15,17 @@ import java.util.List;
 
 public class SampleEditPlaylistController {
     @FXML private TextField nameField;
-    @FXML private ListView<String> songListView;
+    @FXML private TableView<Song> songTableView;
+    @FXML private TableColumn<Song, String> locationColumn;
+    @FXML private TableColumn<Song, String> nameColumn;
 
     private Playlist playlist;
 
     @FXML
     void initialize() {
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
+
         nameField.textProperty().addListener((observable, oldValue, newValue) -> playlist.name = newValue);
     }
 
@@ -47,7 +54,7 @@ public class SampleEditPlaylistController {
 
     @FXML
     void onDownButtonPress() {
-        int selectedIndex = songListView.getSelectionModel().getSelectedIndex();
+        int selectedIndex = songTableView.getSelectionModel().getSelectedIndex();
         if (selectedIndex == -1 || selectedIndex == playlist.getPlaylistLength() - 1) return;
         playlist.swapSongs(selectedIndex, selectedIndex + 1);
         update();
@@ -55,7 +62,7 @@ public class SampleEditPlaylistController {
 
     @FXML
     void onUpButtonPress() {
-        int selectedIndex = songListView.getSelectionModel().getSelectedIndex();
+        int selectedIndex = songTableView.getSelectionModel().getSelectedIndex();
         if (selectedIndex == -1 || selectedIndex == 0) return;
         playlist.swapSongs(selectedIndex, selectedIndex - 1);
         update();
@@ -63,14 +70,14 @@ public class SampleEditPlaylistController {
 
     @FXML
     void onRemoveSongButtonPress() {
-        if (songListView.getSelectionModel().getSelectedIndex() == -1) return;
-        playlist.removeSong(songListView.getSelectionModel().getSelectedIndex());
+        if (songTableView.getSelectionModel().getSelectedIndex() == -1) return;
+        playlist.removeSong(songTableView.getSelectionModel().getSelectedIndex());
         update();
     }
 
     void update() {
         nameField.textProperty().setValue(playlist.name);
-        songListView.setItems(playlist.getSongNames());
+        songTableView.setItems(playlist.getSongList());
     }
 
     Playlist getPlaylist() {

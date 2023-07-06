@@ -24,6 +24,13 @@ public class Playlist{
         this.name = name;
     }
 
+    public Playlist(Playlist p) {
+        index = 0;
+        name = p.name;
+        songList = FXCollections.observableArrayList(p.songList);
+        player = new AudioPlayer();
+    }
+
     public String getName() {
         return name;
     }
