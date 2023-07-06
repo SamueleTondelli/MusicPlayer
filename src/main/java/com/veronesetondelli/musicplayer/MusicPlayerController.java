@@ -38,6 +38,7 @@ public class MusicPlayerController implements Runnable{
     private boolean mute;
     private boolean updateProgressBar;
     private boolean jump;
+    private boolean updateImage;
     private double currVol;
     private Thread t;
     private Thread metadataLoaderThread;
@@ -52,7 +53,13 @@ public class MusicPlayerController implements Runnable{
     @FXML
     private Label durationLabel;
     @FXML
+    private Label currentArtistLabel;
+    @FXML
+    private Label currentPlaylistLabel;
+    @FXML
     private Slider songProgressSlider;
+    @FXML
+    private ImageView coverArtView;
     @FXML
     private TableView<Playlist> playlistListTable;
     @FXML
@@ -344,10 +351,14 @@ public class MusicPlayerController implements Runnable{
             skip = false;
             previous = false;
             jump = false;
+            updateImage = true;
             getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
 
             Platform.runLater(() -> {
                 currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName().substring(0, getPlayingPlaylist().getCurrentSongName().length() - 4));
+                currentPlaylistLabel.setText(getPlayingPlaylist().getName());
+                currentArtistLabel.setText(getPlayingPlaylist().getSongList().get(currentlyPlayingPlaylist).getArtist());
+                coverArtView.setImage(getPlayingPlaylist().getPlayer().getCover());
                 songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().isPlaying()) {
@@ -370,6 +381,9 @@ public class MusicPlayerController implements Runnable{
                                 (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
                                 (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
                         volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
+                        if (updateImage || getPlayingPlaylist().isPlayerReady()) {
+                            updateImage = false;
+                        }
                     });
                 }
 

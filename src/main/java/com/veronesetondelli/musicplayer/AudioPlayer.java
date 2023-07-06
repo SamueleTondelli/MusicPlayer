@@ -1,5 +1,6 @@
 package com.veronesetondelli.musicplayer;
 
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -11,18 +12,24 @@ import java.util.TimerTask;
 
 public class AudioPlayer {
     private boolean playing;
+    private boolean playerIsReady;
     private Media media;
     private MediaPlayer mediaPlayer;
     private Timer timer;
     private TimerTask task;
 
-    AudioPlayer () { playing = false;}
+    AudioPlayer () {
+        playing = false;
+        playerIsReady = false;
+    }
 
     public void loadAudioFile(Song song) {
         try {
+            playerIsReady = false;
             media = song.getMedia();
             if (mediaPlayer != null) mediaPlayer.dispose();
             mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setOnReady(() -> playerIsReady = true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,4 +91,8 @@ public class AudioPlayer {
     public void setSongProgress(double progress) {
         mediaPlayer.seek(Duration.millis((media.getDuration().toMillis() * progress) / 100));
     }
+
+    public boolean isPlayerReady() { return playerIsReady; }
+
+    public Image getCover() { return (Image)media.getMetadata().get("image");}
 }

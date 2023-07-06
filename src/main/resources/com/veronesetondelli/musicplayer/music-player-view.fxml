@@ -17,31 +17,21 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.MusicPlayerController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.MusicPlayerController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#handleSaveAsJSON" text="Save playlist as JSON" />
-              <MenuItem mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-                  <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#handleCloseButton" text="Close" />
             </items>
           </Menu>
         </menus>
       </MenuBar>
    </top>
    <left>
-      <AnchorPane prefHeight="374.0" prefWidth="202.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="494.0" prefWidth="202.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton layoutX="14.0" layoutY="56.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="130.0" text="Add Playlist" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
               <items>
@@ -118,13 +108,13 @@
       </AnchorPane>
    </center>
    <bottom>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="98.0" prefWidth="687.0" BorderPane.alignment="CENTER">
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="98.0" prefWidth="1208.0" BorderPane.alignment="CENTER">
          <children>
-            <Slider fx:id="songProgressSlider" blockIncrement="1.0" layoutX="200.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMousePressed="#onSongProgressSliderPress" onMouseReleased="#handleSongProgressChange" prefHeight="6.0" prefWidth="500.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+            <Slider fx:id="songProgressSlider" blockIncrement="1.0" layoutX="200.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMousePressed="#onSongProgressSliderPress" onMouseReleased="#handleSongProgressChange" prefHeight="6.0" prefWidth="500.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="300.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor></Slider>
-            <Button fx:id="playBtn" layoutX="324.0" layoutY="13.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onPlayButtonClick" prefHeight="43.0" prefWidth="51.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="324.0" AnchorPane.rightAnchor="324.8" AnchorPane.topAnchor="25.200000000000003">
+            <Button fx:id="playBtn" layoutX="574.0" layoutY="25.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onPlayButtonClick" prefHeight="43.0" prefWidth="51.0" AnchorPane.bottomAnchor="30.200000000000003">
                <graphic>
                   <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -136,7 +126,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="397.0" layoutY="15.0" mnemonicParsing="false" onAction="#onSkipButtonPress" AnchorPane.bottomAnchor="32.0">
+            <Button layoutX="649.0" layoutY="27.0" mnemonicParsing="false" onAction="#onSkipButtonPress" AnchorPane.bottomAnchor="33.0">
                <graphic>
                   <ImageView fitHeight="30.0" fitWidth="30.0" onMouseClicked="#onSkipButtonPress" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -145,7 +135,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button layoutX="254.0" layoutY="15.0" mnemonicParsing="false" onAction="#onPreviousButtonPress" prefHeight="36.0" prefWidth="40.0" AnchorPane.bottomAnchor="32.0">
+            <Button layoutX="496.0" layoutY="27.0" mnemonicParsing="false" onAction="#onPreviousButtonPress" prefHeight="36.0" prefWidth="40.0" AnchorPane.bottomAnchor="33.0">
                <graphic>
                   <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -154,9 +144,15 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Label fx:id="secondsLabel" layoutX="117.0" layoutY="57.0" prefHeight="18.0" prefWidth="41.0" text="0:00" />
-            <Label fx:id="currentSongLabel" alignment="CENTER" layoutX="257.0" layoutY="5.0" prefHeight="18.0" prefWidth="186.0" text="song" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="257.0" AnchorPane.rightAnchor="257.0" />
-            <Label fx:id="durationLabel" layoutX="559.0" layoutY="57.0" prefHeight="18.0" prefWidth="26.0" text="0:00" />
+            <Label fx:id="secondsLabel" layoutX="317.0" layoutY="56.0" prefHeight="18.0" prefWidth="41.0" text="0:00" AnchorPane.bottomAnchor="24.0" />
+            <Label fx:id="currentSongLabel" layoutX="124.0" layoutY="68.0" prefHeight="18.0" prefWidth="160.0" text="song" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="124.0" />
+            <Label fx:id="durationLabel" layoutX="860.0" layoutY="57.0" prefHeight="18.0" prefWidth="26.0" text="0:00" AnchorPane.bottomAnchor="23.0" />
+            <ImageView fx:id="coverArtView" fitHeight="50.0" fitWidth="50.0" layoutX="65.0" layoutY="34.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
+            <Label layoutX="72.0" layoutY="32.0" text="Playlist:" />
+            <Label fx:id="currentPlaylistLabel" layoutX="124.0" layoutY="31.0" prefHeight="18.0" prefWidth="160.0" text="playlist" AnchorPane.leftAnchor="124.0" />
+            <Label layoutX="72.0" layoutY="68.0" text="Song:" />
+            <Label fx:id="currentArtistLabel" layoutX="124.0" layoutY="50.0" prefHeight="18.0" prefWidth="160.0" text="artist" AnchorPane.leftAnchor="124.0" />
+            <Label layoutX="72.0" layoutY="50.0" text="Artist:" />
          </children>
       </AnchorPane>
    </bottom>

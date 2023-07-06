@@ -57,7 +57,6 @@ public class Playlist{
     public void loadCurrentIndex() {
         player.loadAudioFile(songList.get(index));
     }
-
     public void nextSong() { index = (index + 1) % songList.size(); }
     public void previousSong() {
         if((getCurrentSongProgress()) > 50) {
@@ -118,6 +117,8 @@ public class Playlist{
         return l;
     }
 
+
+
     public void stopPlayer() {
         player.stop();
     }
@@ -136,5 +137,12 @@ public class Playlist{
 
     public boolean isPlaying() {
         return player.isPlaying();
+    }
+
+    public boolean isPlayerReady() {
+        return player.isPlayerReady();
+    }
+    public AudioPlayer getPlayer() {
+        return player;
     }
 }
