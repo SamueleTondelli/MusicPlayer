@@ -171,9 +171,9 @@ public class MusicPlayerController implements Runnable{
     void handleCreatePlaylist() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-edit-view.fxml"));
+            loader.setLocation(getClass().getResource("edit-view.fxml"));
             DialogPane view = loader.load();
-            SampleEditPlaylistController controller = loader.getController();
+            EditPlaylistController controller = loader.getController();
 
             controller.setPlaylist(new Playlist("name"));
 
@@ -234,9 +234,9 @@ public class MusicPlayerController implements Runnable{
         if (playlistListTable.getSelectionModel().getSelectedIndex() == -1) return;
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("sample-edit-view.fxml"));
+            loader.setLocation(getClass().getResource("edit-view.fxml"));
             DialogPane view = loader.load();
-            SampleEditPlaylistController controller = loader.getController();
+            EditPlaylistController controller = loader.getController();
 
             int editingPlaylistIndex = currentlySelectedPlaylist;
             if (editingPlaylistIndex == currentlyPlayingPlaylist) {

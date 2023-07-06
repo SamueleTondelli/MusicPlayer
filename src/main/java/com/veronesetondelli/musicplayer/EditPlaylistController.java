@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class SampleEditPlaylistController {
+public class EditPlaylistController {
     @FXML private TextField nameField;
     @FXML private TableView<Song> songTableView;
     @FXML private TableColumn<Song, String> locationColumn;
