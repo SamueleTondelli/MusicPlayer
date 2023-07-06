@@ -131,15 +131,7 @@ public class MusicPlayerController implements Runnable{
             p.addSong("C:\\Users\\veron\\Desktop\\playlist\\chepalle.wav");
             p.addSong("C:\\Users\\veron\\Desktop\\playlist\\vecchio.wav");
             playlistList.add(p);
-            metadataLoaderThread = new Thread(() -> {
-                Long begin = System.nanoTime();
-                p.loadMetadata();
-                Long end = System.nanoTime();
-                System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " " +
-                        "ms");
-                songTableView.refresh();
-            });
-            metadataLoaderThread.start();
+            loadPlaylistMetadata(p);
         }
     }
     @FXML
@@ -187,14 +179,7 @@ public class MusicPlayerController implements Runnable{
                 Playlist p = controller.getPlaylist();
                 playlistList.add(p);
                 playlistListTable.setItems(playlistList);
-                metadataLoaderThread = new Thread(() -> {
-                    Long begin = System.nanoTime();
-                    p.loadMetadata();
-                    Long end = System.nanoTime();
-                    System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
-                    songTableView.refresh();
-                });
-                metadataLoaderThread.start();
+                loadPlaylistMetadata(p);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,14 +199,7 @@ public class MusicPlayerController implements Runnable{
                 Playlist p = new Playlist(file.getName().substring(0, file.getName().length() - 5));
                 p.addSongs(songs);
                 playlistList.add(p);
-                metadataLoaderThread = new Thread(() -> {
-                    Long begin = System.nanoTime();
-                    p.loadMetadata();
-                    Long end = System.nanoTime();
-                    System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
-                    songTableView.refresh();
-                });
-                metadataLoaderThread.start();
+                loadPlaylistMetadata(p);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -265,14 +243,7 @@ public class MusicPlayerController implements Runnable{
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 playlistList.set(editingPlaylistIndex, controller.getPlaylist());
                 playlistListTable.setItems(playlistList);
-                metadataLoaderThread = new Thread(() -> {
-                    Long begin = System.nanoTime();
-                    playlistList.get(editingPlaylistIndex).loadMetadata();
-                    Long end = System.nanoTime();
-                    System.out.println("Loading " + playlistList.get(editingPlaylistIndex).getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
-                    songTableView.refresh();
-                });
-                metadataLoaderThread.start();
+                loadPlaylistMetadata(playlistList.get(editingPlaylistIndex));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,6 +298,16 @@ public class MusicPlayerController implements Runnable{
     }
     Playlist getPlayingPlaylist() { return playlistList.get(currentlyPlayingPlaylist); }
     Playlist getSelectedPlaylist() { return playlistList.get(currentlySelectedPlaylist); }
+    void loadPlaylistMetadata(Playlist p) {
+        metadataLoaderThread = new Thread(() -> {
+            Long begin = System.nanoTime();
+            p.loadMetadata();
+            Long end = System.nanoTime();
+            System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
+            songTableView.refresh();
+        });
+        metadataLoaderThread.start();
+    }
     @Override
     public void run() {
         while (true) {
