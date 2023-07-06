@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -238,7 +239,11 @@ public class MusicPlayerController implements Runnable{
             SampleEditPlaylistController controller = loader.getController();
 
             int editingPlaylistIndex = currentlySelectedPlaylist;
-            if (editingPlaylistIndex == currentlyPlayingPlaylist) stop = true;
+            if (editingPlaylistIndex == currentlyPlayingPlaylist) {
+                playlistListTable.getSelectionModel().clearSelection();
+                songTableView.setItems(null);
+                stopPlay();
+            }
             controller.setPlaylist(new Playlist(playlistList.get(editingPlaylistIndex)));
             controller.update();
 
@@ -260,13 +265,7 @@ public class MusicPlayerController implements Runnable{
     void onRemovePlaylistButtonPress() {
         if (playlistList.size() == 0 || currentlySelectedPlaylist == -1) return;
         if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
-            stop = true;
-            try {
-                t.join(150L);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+            stopPlay();
         }
         if (metadataLoaderThread != null) {
             try {
@@ -277,9 +276,12 @@ public class MusicPlayerController implements Runnable{
             }
         }
         playlistList.remove(currentlySelectedPlaylist);
+        if (currentlyPlayingPlaylist > currentlySelectedPlaylist) currentlyPlayingPlaylist--;
         playlistListTable.setItems(playlistList);
-        playlistListTable.getSelectionModel().clearSelection();
-        songTableView.setItems(null);
+        if (currentlyPlayingPlaylist > 0) playlistListTable.getSelectionModel().select(currentlyPlayingPlaylist);
+        else playlistListTable.getSelectionModel().clearSelection();
+        songTableView.getSelectionModel().clearSelection();
+        songTableView.setItems(currentlySelectedPlaylist > 0 ? getPlayingPlaylist().getSongList() : null);
     }
     @FXML
     void onMuteButtonClick() {
@@ -324,14 +326,7 @@ public class MusicPlayerController implements Runnable{
 
 
     void handleClose() {
-        stop = true;
-        if (t != null) {
-            try {
-                t.join(150L);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        stopPlay();
 
         if (metadataLoaderThread != null) {
             try {
@@ -358,7 +353,6 @@ public class MusicPlayerController implements Runnable{
                 currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName().substring(0, getPlayingPlaylist().getCurrentSongName().length() - 4));
                 currentPlaylistLabel.setText(getPlayingPlaylist().getName());
                 currentArtistLabel.setText(getPlayingPlaylist().getSongList().get(currentlyPlayingPlaylist).getArtist());
-                coverArtView.setImage(getPlayingPlaylist().getPlayer().getCover());
                 songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().isPlaying()) {
@@ -371,21 +365,21 @@ public class MusicPlayerController implements Runnable{
                     getPlayingPlaylist().stopPlayer();
                     break;
                 }
-                if (updateProgressBar) {
-                    Platform.runLater(() -> {
-                        songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
-                        secondsLabel.setText(String.format("%d:%02d",
-                                (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() / 60,
-                                (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() % 60));
-                        durationLabel.setText(String.format("%d:%02d",
-                                (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
-                                (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
-                        volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
-                        if (updateImage || getPlayingPlaylist().isPlayerReady()) {
-                            updateImage = false;
-                        }
-                    });
-                }
+
+                Platform.runLater(() -> {
+                    if (updateProgressBar) songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
+                    secondsLabel.setText(String.format("%d:%02d",
+                            (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() / 60,
+                            (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() % 60));
+                    durationLabel.setText(String.format("%d:%02d",
+                            (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
+                            (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
+                    volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
+                    if (updateImage && getPlayingPlaylist().isPlayerReady()) {
+                        coverArtView.setImage(getPlayingPlaylist().getPlayer().getCover());
+                        updateImage = false;
+                    }
+                });
 
                 try {
                     Thread.sleep(100);
@@ -399,5 +393,17 @@ public class MusicPlayerController implements Runnable{
                 getPlayingPlaylist().nextSong();
             }
         }
+    }
+
+    public void stopPlay() {
+        stop = true;
+        if (t != null) {
+            try {
+                t.join(250L);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        currentlyPlayingPlaylist = -1;
     }
 }
