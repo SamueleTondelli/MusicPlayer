@@ -12,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -25,7 +27,8 @@ public class MusicPlayerController implements Runnable{
 
     @FXML
     private Button muteBtn;
-
+    @FXML
+    private Button playBtn;
     @FXML
     private Label volumeLabel;
 
@@ -41,12 +44,16 @@ public class MusicPlayerController implements Runnable{
     private boolean jump;
     private double currVol;
     private Thread t;
+    private Image imagePause = new Image(getClass().getResourceAsStream("pause-ret.png"));
+    private Image imagePlay = new Image(getClass().getResourceAsStream("play-button-ret.png"));
     @FXML
     private Slider volumeSlider;
     @FXML
     private Label currentSongLabel;
     @FXML
     private Label secondsLabel;
+    @FXML
+    private Label durationLabel;
     @FXML
     private Slider songProgressSlider;
     @FXML
@@ -135,11 +142,12 @@ public class MusicPlayerController implements Runnable{
         if (stop) return;
         if (playing) {
             getPlayingPlaylist().pause();
+            playBtn.setGraphic(new ImageView(imagePause));
             playing = false;
         }
         else {
-            //btn.setText("pause");
             getPlayingPlaylist().playCurrentIndex();
+            playBtn.setGraphic(new ImageView(imagePlay));
             playing = true;
         }
     }
@@ -246,7 +254,7 @@ public class MusicPlayerController implements Runnable{
         if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
             stop = true;
             try {
-                t.join(150L);
+                t.join();
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -298,15 +306,6 @@ public class MusicPlayerController implements Runnable{
                 songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().player.isPlaying()) {
-                if (updateProgressBar) {
-                    Platform.runLater(() -> {
-                            songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
-                            secondsLabel.setText(String.format("%d:%02d",
-                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() / 60,
-                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() % 60));
-                            volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
-                        });
-                }
                 if (stop) {
                     playing = false;
                     getPlayingPlaylist().player.stop();
@@ -316,7 +315,18 @@ public class MusicPlayerController implements Runnable{
                     getPlayingPlaylist().player.stop();
                     break;
                 }
-
+                if (updateProgressBar) {
+                    Platform.runLater(() -> {
+                            songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
+                            secondsLabel.setText(String.format("%d:%02d",
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() / 60,
+                                    (int)getPlayingPlaylist().player.getPlayingTimeSeconds() % 60));
+                            durationLabel.setText(String.format("%d:%02d",
+                                    (int)getPlayingPlaylist().player.getSongLengthSeconds() / 60,
+                                    (int)getPlayingPlaylist().player.getSongLengthSeconds() % 60));
+                            volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
+                        });
+                }
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
