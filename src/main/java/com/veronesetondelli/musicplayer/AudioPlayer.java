@@ -5,8 +5,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 

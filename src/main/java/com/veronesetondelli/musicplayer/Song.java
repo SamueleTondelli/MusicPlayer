@@ -1,12 +1,10 @@
 package com.veronesetondelli.musicplayer;
 
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import org.apache.tika.metadata.Metadata;
 import org.xml.sax.ContentHandler;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
-import org.apache.tika.parser.audio.AudioParser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.xml.sax.helpers.DefaultHandler;
 
