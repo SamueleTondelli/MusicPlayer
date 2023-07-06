@@ -146,12 +146,16 @@ public class MusicPlayerController implements Runnable{
     }
     @FXML
     void onSkipButtonPress() {
-        if (!stop) {skip = true;}
+        if (!stop) {
+            skip = true;
+            playBtn.setGraphic(new ImageView(imagePlay));
+        }
     }
     @FXML
     void onPreviousButtonPress() {
         if (!stop) {
             previous = true;
+            playBtn.setGraphic(new ImageView(imagePlay));
             getPlayingPlaylist().previousSong();
         }
     }
@@ -304,6 +308,13 @@ public class MusicPlayerController implements Runnable{
         });
         metadataLoaderThread.start();
     }
+
+    @FXML
+    void handleCloseButton() {
+        handleClose();
+        System.exit(0);
+    }
+
 
     void handleClose() {
         stop = true;
