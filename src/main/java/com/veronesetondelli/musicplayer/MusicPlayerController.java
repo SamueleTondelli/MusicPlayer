@@ -43,8 +43,8 @@ public class MusicPlayerController implements Runnable{
     private double currVol;
     private Thread t;
     private Thread metadataLoaderThread;
-    private Image imagePause = new Image(getClass().getResourceAsStream("pause-ret.png"));
-    private Image imagePlay = new Image(getClass().getResourceAsStream("play-button-ret.png"));
+    private Image imagePause;
+    private Image imagePlay;
     @FXML
     private Slider volumeSlider;
     @FXML
@@ -84,6 +84,9 @@ public class MusicPlayerController implements Runnable{
         mute = false;
         updateProgressBar = true;
         jump = false;
+
+        imagePause = new Image(getClass().getResourceAsStream("pause-ret.png"));
+        imagePlay = new Image(getClass().getResourceAsStream("play-button-ret.png"));
 
         playlistList = FXCollections.observableArrayList();
         playlistNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
