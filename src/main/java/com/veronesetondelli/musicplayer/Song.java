@@ -62,9 +62,15 @@ public class Song {
     public String getFileName() {
         return fileName;
     }
-    public boolean getMetadataHasBeenLoaded() { return metadataHasBeenLoaded; }
-    public String getLocation() {return fileLocation;}
-    public String getArtist() {return metadataHasBeenLoaded ? artist : "NA";}
+    public boolean getMetadataHasBeenLoaded() {
+        return metadataHasBeenLoaded;
+    }
+    public String getLocation() {
+        return fileLocation;
+    }
+    public String getArtist() {
+        return metadataHasBeenLoaded ? artist : "NA";
+    }
     public String getDurationFormatted() {
         if (metadataHasBeenLoaded) {
             return duration >= 0 ? String.format("%d:%02d", getDuration() / 60, getDuration() % 60) : "--:--";

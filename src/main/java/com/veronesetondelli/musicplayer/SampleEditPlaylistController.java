@@ -26,7 +26,7 @@ public class SampleEditPlaylistController {
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
 
-        nameField.textProperty().addListener((observable, oldValue, newValue) -> playlist.name = newValue);
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> playlist.setName(newValue));
     }
 
     @FXML
@@ -76,7 +76,7 @@ public class SampleEditPlaylistController {
     }
 
     void update() {
-        nameField.textProperty().setValue(playlist.name);
+        nameField.textProperty().setValue(playlist.getName());
         songTableView.setItems(playlist.getSongList());
     }
 

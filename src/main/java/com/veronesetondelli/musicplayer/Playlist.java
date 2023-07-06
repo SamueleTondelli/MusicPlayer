@@ -11,10 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Playlist{
-    ObservableList<Song> songList;
-    AudioPlayer player;
-    int index;
-    String name;
+    private ObservableList<Song> songList;
+    private AudioPlayer player;
+    private int index;
+    private String name;
     private final int NUMBER_LOADER_THREADS = 4;
 
     public Playlist(String name) {
@@ -116,5 +116,25 @@ public class Playlist{
         List<String> l = new ArrayList<>();
         songList.forEach(s -> l.add(s.getFilePath()));
         return l;
+    }
+
+    public void stopPlayer() {
+        player.stop();
+    }
+
+    public double getCurrentPlayingTimeSeconds() {
+        return player.getPlayingTimeSeconds();
+    }
+
+    public double getCurrentSongLengthSeconds() {
+        return player.getSongLengthSeconds();
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public boolean isPlaying() {
+        return player.isPlaying();
     }
 }
