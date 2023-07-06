@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,10 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.util.List;
@@ -307,6 +303,25 @@ public class MusicPlayerController implements Runnable{
             songTableView.refresh();
         });
         metadataLoaderThread.start();
+    }
+
+    void handleClose() {
+        stop = true;
+        if (t != null) {
+            try {
+                t.join(150L);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (metadataLoaderThread != null) {
+            try {
+                metadataLoaderThread.join(3000L);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     @Override
     public void run() {

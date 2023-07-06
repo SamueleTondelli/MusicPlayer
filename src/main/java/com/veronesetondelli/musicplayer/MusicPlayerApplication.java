@@ -12,6 +12,8 @@ public class MusicPlayerApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlayerApplication.class.getResource("music-player-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        MusicPlayerController controller = (MusicPlayerController)fxmlLoader.getController();
+        stage.setOnCloseRequest((e) -> controller.handleClose());
         stage.setTitle("Music Player");
         stage.setScene(scene);
         stage.setMinHeight(400);
