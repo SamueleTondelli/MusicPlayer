@@ -19,6 +19,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller class for the MusicPlayerView
+ */
 public class MusicPlayerController implements Runnable {
 
     ObservableList<Playlist> playlistList;
@@ -72,8 +75,12 @@ public class MusicPlayerController implements Runnable {
     @FXML
     private TableColumn<Song, String> lengthColumn;
 
+    /**
+     * Initializes the controller class. This method is automatically called when the fxml file has been loaded.
+     */
     @FXML
     void initialize() {
+        // Resets all the flags
         currentlyPlayingPlaylist = -1;
         playing = false;
         skip = false;
@@ -83,13 +90,14 @@ public class MusicPlayerController implements Runnable {
         updateSongProgress = true;
         jump = false;
 
+        // Load images for the play/pause button
         imagePause = new Image(getClass().getResourceAsStream("pause-ret.png"));
         imagePlay = new Image(getClass().getResourceAsStream("play-button-ret.png"));
 
+        // Initializes the playlist table
         playlistList = FXCollections.observableArrayList();
         playlistNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         playlistListTable.setItems(playlistList);
-
         playlistListTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             currentlySelectedPlaylist = newValue.intValue();
             songTableView.getSelectionModel().clearSelection();
@@ -98,6 +106,7 @@ public class MusicPlayerController implements Runnable {
             }
         });
 
+        // Initializes the song list table
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
         artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("durationFormatted"));
@@ -105,21 +114,26 @@ public class MusicPlayerController implements Runnable {
             if (newValue.intValue() == -1)
                 return;
             if (currentlyPlayingPlaylist == -1) {
+                // No playlist is playing
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
                 getSelectedPlaylist().setIndex(newValue.intValue());
+                // Starts the thread which plays the playlist
                 t = new Thread(this);
                 t.start();
             } else if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
+                // A song gets selected in the same playlist
                 if (!stop) {
                     jump = true;
                     getSelectedPlaylist().stopPlayer();
                     getSelectedPlaylist().setIndex(newValue.intValue());
                 } else {
                     getSelectedPlaylist().setIndex(newValue.intValue());
+                    // Starts the thread which plays the playlist
                     t = new Thread(this);
                     t.start();
                 }
             } else {
+                // A song is selected in a different playlist
                 jump = true;
                 getPlayingPlaylist().stopPlayer();
                 currentlyPlayingPlaylist = currentlySelectedPlaylist;
@@ -127,6 +141,7 @@ public class MusicPlayerController implements Runnable {
             }
         });
 
+        // Volume controls initializations
         volumeSlider.setValue(volumeSlider.getMax());
         volumeLabel.setText("100");
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -183,13 +198,16 @@ public class MusicPlayerController implements Runnable {
             DialogPane view = loader.load();
             EditPlaylistController controller = loader.getController();
 
+            // Set an empty playlist in the controller
             controller.setPlaylist(new Playlist("name"));
 
+            // Create The dialog
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("New Playlist");
             dialog.initModality(Modality.WINDOW_MODAL);
             dialog.setDialogPane(view);
 
+            // Show the dialog and wait until the user closes it
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 Playlist p = controller.getPlaylist();
@@ -202,6 +220,11 @@ public class MusicPlayerController implements Runnable {
         }
     }
 
+    /**
+     * Loads the metadata of p on a different thread
+     *
+     * @param p playlist of the metadata to be loaded
+     */
     void loadPlaylistMetadata(Playlist p) {
         metadataLoaderThread = new Thread(() -> {
             Long begin = System.nanoTime();
@@ -262,19 +285,24 @@ public class MusicPlayerController implements Runnable {
             DialogPane view = loader.load();
             EditPlaylistController controller = loader.getController();
 
+            // Ensures that the edited playlist is the one selected at the start
             int editingPlaylistIndex = currentlySelectedPlaylist;
             if (editingPlaylistIndex == currentlyPlayingPlaylist) {
                 playlistListTable.getSelectionModel().clearSelection();
                 songTableView.setItems(null);
                 stopPlay();
             }
+            // Set the playlist in the controller
             controller.setPlaylist(new Playlist(playlistList.get(editingPlaylistIndex)));
             controller.update();
 
+            // Create the dialog
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Edit Playlist");
             dialog.initModality(Modality.WINDOW_MODAL);
             dialog.setDialogPane(view);
+
+            // Show the dialog and wait the until the user closes it
             Optional<ButtonType> clickedButton = dialog.showAndWait();
             if (clickedButton.orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 playlistList.set(editingPlaylistIndex, controller.getPlaylist());
@@ -286,8 +314,13 @@ public class MusicPlayerController implements Runnable {
         }
     }
 
+    /**
+     * Stops playing the current playlist
+     */
     public void stopPlay() {
         stop = true;
+
+        // Wait for the playing thread to terminate
         if (t != null) {
             try {
                 t.join(150L);
@@ -295,8 +328,12 @@ public class MusicPlayerController implements Runnable {
                 e.printStackTrace();
             }
         }
+
+        // Tell the javafx thread to not update the current song elements
         updateSongProgress = false;
         updateSongData = false;
+
+        //Resets all the graphical elements
         currentlyPlayingPlaylist = -1;
         currentArtistLabel.setText(" ");
         currentPlaylistLabel.setText(" ");
@@ -314,6 +351,8 @@ public class MusicPlayerController implements Runnable {
         if (currentlySelectedPlaylist == currentlyPlayingPlaylist) {
             stopPlay();
         }
+
+        // Wait for the thread which loads the metadata to finish
         if (metadataLoaderThread != null) {
             try {
                 metadataLoaderThread.join(3000L);
@@ -321,14 +360,20 @@ public class MusicPlayerController implements Runnable {
                 e.printStackTrace();
             }
         }
+
+        // Removes the playlist
         playlistList.remove(currentlySelectedPlaylist);
         if (currentlyPlayingPlaylist > currentlySelectedPlaylist)
             currentlyPlayingPlaylist--;
+
+        // Updates the playlist table
         playlistListTable.setItems(playlistList);
         if (currentlyPlayingPlaylist > 0)
             playlistListTable.getSelectionModel().select(currentlyPlayingPlaylist);
         else
             playlistListTable.getSelectionModel().clearSelection();
+
+        // Updates the song list table
         songTableView.getSelectionModel().clearSelection();
         songTableView.setItems(currentlySelectedPlaylist > 0 ? getPlayingPlaylist().getSongList() : null);
     }
@@ -368,6 +413,9 @@ public class MusicPlayerController implements Runnable {
         System.exit(0);
     }
 
+    /**
+     * Stops other threads in a safe way
+     */
     void handleClose() {
         stopPlay();
 
@@ -380,19 +428,26 @@ public class MusicPlayerController implements Runnable {
         }
     }
 
+    /**
+     * Thread which play the playlist
+     */
     @Override
     public void run() {
         while (true) {
             getPlayingPlaylist().loadCurrentIndex();
             getPlayingPlaylist().playCurrentIndex();
+
+            //resets flags
             stop = false;
             playing = true;
             skip = false;
             previous = false;
             jump = false;
             updateSongData = true;
+
             getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
 
+            // Updates the elements which don't need for the player to be ready
             Platform.runLater(() -> {
                 playBtn.setGraphic(new ImageView(imagePlay));
                 currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName().substring(0, getPlayingPlaylist().getCurrentSongName().length() - 4));
@@ -400,6 +455,8 @@ public class MusicPlayerController implements Runnable {
                 currentArtistLabel.setText(getPlayingPlaylist().getArtist());
                 songTableView.getSelectionModel().clearSelection();
             });
+
+            // Playing loop
             while (getPlayingPlaylist().isPlaying()) {
                 if (stop) {
                     playing = false;
@@ -411,6 +468,7 @@ public class MusicPlayerController implements Runnable {
                     break;
                 }
 
+                // Updates the elements which need for the player to be ready and the song progress elements
                 Platform.runLater(() -> {
                     if (updateSongProgress) {
                         songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());

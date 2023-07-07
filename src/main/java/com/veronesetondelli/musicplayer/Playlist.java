@@ -10,13 +10,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Playlist class
+ */
 public class Playlist {
     private final int NUMBER_LOADER_THREADS = 4;
     private final ObservableList<Song> songList;
     private final AudioPlayer player;
+    /** Index of the selected song */
     private int index;
     private String name;
 
+    /**
+     * Constructor
+     *
+     * @param name of the playlist
+     */
     public Playlist(String name) {
         index = 0;
         songList = FXCollections.observableArrayList();
@@ -24,6 +33,11 @@ public class Playlist {
         this.name = name;
     }
 
+    /**
+     * Constructor
+     *
+     * @param p playlist to be constructed from
+     */
     public Playlist(Playlist p) {
         index = 0;
         name = p.name;
@@ -55,10 +69,6 @@ public class Playlist {
         songList.remove(index);
     }
 
-    public void removeAllSongs() {
-        songList.clear();
-    }
-
     public void playCurrentIndex() {
         player.play();
     }
@@ -81,16 +91,17 @@ public class Playlist {
         }
     }
 
+    /**
+     * Returns the current song progress
+     *
+     * @return progress between 0 and 100
+     */
     public double getCurrentSongProgress() {
         return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100;
     }
 
     public void setCurrentSongProgress(double progress) {
         player.setSongProgress(progress);
-    }
-
-    public double getVolume() {
-        return player.getVolume();
     }
 
     public void setVolume(double volume) {
@@ -119,12 +130,17 @@ public class Playlist {
         return songList.size();
     }
 
+    /**
+     * Loads all the songs' related metadata
+     */
     public void loadMetadata() {
         ExecutorService executor = Executors.newFixedThreadPool(NUMBER_LOADER_THREADS);
+        // Only the songs which haven't already been loaded get submitted to the executor service
         songList.stream().filter(s -> !s.getMetadataHasBeenLoaded()).forEach(s -> executor.execute(s::loadMetadata));
         executor.shutdown();
         try {
             if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+                // Shows an alert in case the executor service gets timed out
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Error loading metadata");
                 alert.setHeaderText("Error loading metadata");
