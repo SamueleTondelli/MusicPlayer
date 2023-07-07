@@ -41,7 +41,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.veronesetondelli.musicplayer.MusicPlayerController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
@@ -120,9 +119,9 @@
             <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="161.0" layoutY="27.0" text="0" AnchorPane.rightAnchor="229.40000000000003" AnchorPane.topAnchor="27.0" />
             <TableView fx:id="songTableView" layoutX="7.0" layoutY="62.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="67.0">
               <columns>
-                <TableColumn fx:id="titleColumn" editable="false" prefWidth="75.0" sortable="false" text="Titolo" />
-                <TableColumn fx:id="artistColumn" editable="false" prefWidth="75.0" sortable="false" text="Artista" />
-                  <TableColumn fx:id="lengthColumn" editable="false" prefWidth="75.0" sortable="false" text="Durata" />
+                <TableColumn fx:id="titleColumn" editable="false" prefWidth="75.0" sortable="false" text="Title" />
+                <TableColumn fx:id="artistColumn" editable="false" prefWidth="75.0" sortable="false" text="Artist" />
+                  <TableColumn fx:id="lengthColumn" editable="false" prefWidth="75.0" sortable="false" text="Duration" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
