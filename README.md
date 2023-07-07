@@ -9,7 +9,7 @@ A simple music player (.mp3 and .wav files).
 - Edit Playlist (load folder, add song, remove song, move up/down song position in the playlist)
 - Save Playlist as JSON (from menu button "File")
 - Display song information (title, artist, lenght, cover art)
-- And much more
+- And much more...
 ---
 
 ## Screenshots
