@@ -117,8 +117,6 @@ public class Playlist{
         return l;
     }
 
-
-
     public void stopPlayer() {
         player.stop();
     }
@@ -144,5 +142,9 @@ public class Playlist{
     }
     public AudioPlayer getPlayer() {
         return player;
+    }
+
+    public String getArtist() {
+       return songList.get(index).getArtist();
     }
 }

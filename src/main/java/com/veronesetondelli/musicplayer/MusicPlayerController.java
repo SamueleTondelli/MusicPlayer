@@ -128,9 +128,15 @@ public class MusicPlayerController implements Runnable{
         });
 
         volumeSlider.setValue(volumeSlider.getMax());
-        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> getPlayingPlaylist().setVolume(newValue.doubleValue() * 0.01));
+        volumeLabel.setText("100");
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if(!stop) {
+                getPlayingPlaylist().setVolume(newValue.doubleValue() * 0.01);
+            }
+            volumeLabel.setText(Long.toString(Math.round(newValue.doubleValue())));
+        });
     }
-    @FXML
+    /*@FXML
     protected void onLoadButtonClick() {
         if (playlistList.size() == 0) {
             Playlist p = new Playlist("p1");
@@ -139,7 +145,7 @@ public class MusicPlayerController implements Runnable{
             playlistList.add(p);
             loadPlaylistMetadata(p);
         }
-    }
+    }*/
     @FXML
     void onPlayButtonClick() {
         if (stop) return;
@@ -158,14 +164,12 @@ public class MusicPlayerController implements Runnable{
     void onSkipButtonPress() {
         if (!stop) {
             skip = true;
-            playBtn.setGraphic(new ImageView(imagePlay));
         }
     }
     @FXML
     void onPreviousButtonPress() {
         if (!stop) {
             previous = true;
-            playBtn.setGraphic(new ImageView(imagePlay));
             getPlayingPlaylist().previousSong();
         }
     }
@@ -287,20 +291,24 @@ public class MusicPlayerController implements Runnable{
     }
     @FXML
     void onMuteButtonClick() {
-        if(!mute) {
-            mute = true;
-            muteBtn.setText("Unmute");
-            currVol = volumeSlider.getValue();
-            volumeSlider.setValue(0.0);
-        } else {
-            mute = false;
-            muteBtn.setText("Mute");
-            volumeSlider.setValue(currVol);
+        if (!stop) {
+            if (!mute) {
+                mute = true;
+                muteBtn.setText("Unmute");
+                currVol = volumeSlider.getValue();
+                volumeSlider.setValue(0.0);
+            } else {
+                mute = false;
+                muteBtn.setText("Mute");
+                volumeSlider.setValue(currVol);
+            }
         }
     }
     @FXML
     void handleSongProgressChange() {
-        getPlayingPlaylist().setCurrentSongProgress(songProgressSlider.getValue());
+        if(!stop) {
+            getPlayingPlaylist().setCurrentSongProgress(songProgressSlider.getValue());
+        }
         updateProgressBar = true;
     }
     @FXML
@@ -351,10 +359,12 @@ public class MusicPlayerController implements Runnable{
             updateImage = true;
             getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
 
+
             Platform.runLater(() -> {
+                playBtn.setGraphic(new ImageView(imagePlay));
                 currentSongLabel.setText(getPlayingPlaylist().getCurrentSongName().substring(0, getPlayingPlaylist().getCurrentSongName().length() - 4));
                 currentPlaylistLabel.setText(getPlayingPlaylist().getName());
-                currentArtistLabel.setText(getPlayingPlaylist().getSongList().get(currentlyPlayingPlaylist).getArtist());
+                currentArtistLabel.setText(getPlayingPlaylist().getArtist());
                 songTableView.getSelectionModel().clearSelection();
             });
             while (getPlayingPlaylist().isPlaying()) {
@@ -376,7 +386,6 @@ public class MusicPlayerController implements Runnable{
                     durationLabel.setText(String.format("%d:%02d",
                             (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
                             (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
-                    volumeLabel.setText(Long.toString(Math.round(volumeSlider.getValue())));
                     if (updateImage && getPlayingPlaylist().isPlayerReady()) {
                         coverArtView.setImage(getPlayingPlaylist().getPlayer().getCover());
                         updateImage = false;
@@ -407,5 +416,12 @@ public class MusicPlayerController implements Runnable{
             }
         }
         currentlyPlayingPlaylist = -1;
+        currentArtistLabel.setText(" ");
+        currentPlaylistLabel.setText(" ");
+        currentSongLabel.setText(" ");
+        coverArtView.setImage(null);
+        songProgressSlider.setValue(0.0);
+        secondsLabel.setText(String.format("%d:%02d", 0, 00));
+        durationLabel.setText(String.format("%d:%02d", 0, 00));
     }
 }

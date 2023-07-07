@@ -93,7 +93,6 @@
                </cursor></Slider>
             <Button fx:id="muteBtn" contentDisplay="CENTER" layoutX="340.0" layoutY="24.0" mnemonicParsing="false" onAction="#onMuteButtonClick" text="Mute" textAlignment="JUSTIFY" AnchorPane.rightAnchor="13.600000000000023" AnchorPane.topAnchor="24.0" />
             <Label fx:id="volumeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="161.0" layoutY="27.0" text="0" AnchorPane.rightAnchor="229.40000000000003" AnchorPane.topAnchor="27.0" />
-            <Button layoutY="15.0" mnemonicParsing="false" onAction="#onLoadButtonClick" prefHeight="42.0" prefWidth="114.0" text="temp load" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0" />
             <TableView fx:id="songTableView" layoutX="7.0" layoutY="62.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="67.0">
               <columns>
                 <TableColumn fx:id="titleColumn" editable="false" prefWidth="75.0" sortable="false" text="Titolo" />

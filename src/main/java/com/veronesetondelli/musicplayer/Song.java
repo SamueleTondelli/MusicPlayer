@@ -1,13 +1,18 @@
 package com.veronesetondelli.musicplayer;
 
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.mp3.AudioFrame;
+import org.apache.tika.parser.mp3.MP3Frame;
 import org.xml.sax.ContentHandler;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.swing.text.html.ImageView;
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -77,4 +82,5 @@ public class Song {
             return "NA";
         }
     }
+
 }
