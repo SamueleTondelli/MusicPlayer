@@ -1,6 +1,8 @@
 # MusicPlayer
 A simple music player (.mp3 and .wav files).
 
+---
+
 ## Features
 - Add Playlist (new or from JSON file)
 - Remove Playlist
@@ -13,11 +15,36 @@ A simple music player (.mp3 and .wav files).
 ## Screenshots
 
 ###### Main window
-![mainwindow.png]()
+![mainwindow.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/mainwindow.png)
 
-######
 
-######
+###### Add playlist
+![addplaylist.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/addplaylist.png)
+
+
+###### New playlist
+![newplaylist.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/newplaylist.png)
+
+
+###### Add songs
+![addsongs.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/addsongs.png)
+
+
+##### Play
+![play.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/play.png)
+
+
+##### Pause and mute
+![pausemute.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/pausemute.png)
+
+
+##### Edit playlist
+![editplaylist.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/editplaylist.png)
+
+
+##### Save playlist as JSON
+![JSON.png](https://github.com/SamueleTondelli/MusicPlayer/blob/master/screenshots/JSON.png)
+
 
 ---
 
