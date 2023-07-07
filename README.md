@@ -49,7 +49,7 @@ A simple music player (.mp3 and .wav files).
 ---
 
 ## Requirements
-The proper JDK or JRE should be installed in your system to run this application (JavaFX version 20.0.1).
+The proper JDK or JRE should be installed in your system to run this application (JavaFX version 17).
 
 ---
 
