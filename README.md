@@ -55,7 +55,7 @@ The proper JDK or JRE should be installed in your system to run this application
 
 ## Download and Usage
 This software is availabe as an **platform independent executable jar** for **Windows, Linux and Mac**  
-You can download the latest version of this sofware [here]().
+You can download the latest version of this sofware [here](https://github.com/SamueleTondelli/MusicPlayer/releases/tag/Release).
 
 To run the application just double-click the downloaded jar.  
 *It runs only when the JDK is installed correctly.*
