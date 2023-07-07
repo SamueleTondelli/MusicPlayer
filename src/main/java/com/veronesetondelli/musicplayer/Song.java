@@ -21,31 +21,15 @@ public class Song {
     private long duration;
     private boolean metadataHasBeenLoaded;
 
+    /**
+     * Constructor
+     *
+     * @param filePath of the song
+     */
     public Song(String filePath) {
         fileName = Paths.get(filePath).getFileName().toString();
         fileLocation = filePath.substring(0, filePath.length() - 1 - fileName.length());
         metadataHasBeenLoaded = false;
-    }
-
-    public void loadMetadata() {
-        if (fileName.endsWith("wav")) {
-            duration = -1;
-            artist = "Unknown";
-            metadataHasBeenLoaded = true;
-            return;
-        }
-        try (InputStream input = new FileInputStream(getFilePath())) {
-            ContentHandler handler = new DefaultHandler();
-            Metadata metadata = new Metadata();
-            Parser parser = new Mp3Parser();
-            ParseContext parseCtx = new ParseContext();
-            parser.parse(input, handler, metadata, parseCtx);
-            duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
-            artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
-            metadataHasBeenLoaded = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public String getFilePath() {
@@ -83,5 +67,29 @@ public class Song {
 
     public long getDuration() {
         return duration;
+    }
+
+    /**
+     * Loads File metadata with distinction between .wav and .mp3 files
+     */
+    public void loadMetadata() {
+        if (fileName.endsWith("wav")) {
+            duration = -1;
+            artist = "Unknown";
+            metadataHasBeenLoaded = true;
+            return;
+        }
+        try (InputStream input = new FileInputStream(getFilePath())) {
+            ContentHandler handler = new DefaultHandler();
+            Metadata metadata = new Metadata();
+            Parser parser = new Mp3Parser();
+            ParseContext parseCtx = new ParseContext();
+            parser.parse(input, handler, metadata, parseCtx);
+            duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
+            artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
+            metadataHasBeenLoaded = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -7,6 +7,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Main class for the application
+ */
 public class MusicPlayerApplication extends Application {
     public static void main(String[] args) {
         launch();
@@ -17,6 +20,7 @@ public class MusicPlayerApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlayerApplication.class.getResource("music-player-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 600);
         MusicPlayerController controller = fxmlLoader.getController();
+        // Callback when the window closes
         stage.setOnCloseRequest((e) -> controller.handleClose());
         stage.setTitle("Music Player");
         stage.setScene(scene);

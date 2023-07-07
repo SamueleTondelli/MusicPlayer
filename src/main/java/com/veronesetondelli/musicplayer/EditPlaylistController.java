@@ -13,6 +13,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Controller class for EditPlaylist
+ */
 public class EditPlaylistController {
     @FXML
     private TextField nameField;
@@ -25,6 +28,9 @@ public class EditPlaylistController {
 
     private Playlist playlist;
 
+    /**
+     * Initializes column of the songTableView and the nameField with its listener
+     */
     @FXML
     void initialize() {
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
@@ -47,6 +53,9 @@ public class EditPlaylistController {
         }
     }
 
+    /**
+     * Updates nameField with playlist name and the songTableView with the songs in the playlist
+     */
     void update() {
         nameField.textProperty().setValue(playlist.getName());
         songTableView.setItems(playlist.getSongList());
