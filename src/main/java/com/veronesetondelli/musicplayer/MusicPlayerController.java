@@ -36,9 +36,9 @@ public class MusicPlayerController implements Runnable{
     private boolean previous;
     private boolean stop;
     private boolean mute;
-    private boolean updateProgressBar;
+    private boolean updateSongProgress;
     private boolean jump;
-    private boolean updateImage;
+    private boolean updateSongData;
     private double currVol;
     private Thread t;
     private Thread metadataLoaderThread;
@@ -81,7 +81,7 @@ public class MusicPlayerController implements Runnable{
         previous = false;
         stop = true;
         mute = false;
-        updateProgressBar = true;
+        updateSongProgress = true;
         jump = false;
 
         imagePause = new Image(getClass().getResourceAsStream("pause-ret.png"));
@@ -309,11 +309,11 @@ public class MusicPlayerController implements Runnable{
         if(!stop) {
             getPlayingPlaylist().setCurrentSongProgress(songProgressSlider.getValue());
         }
-        updateProgressBar = true;
+        updateSongProgress = true;
     }
     @FXML
     void onSongProgressSliderPress() {
-        updateProgressBar = false;
+        updateSongProgress = false;
     }
     Playlist getPlayingPlaylist() { return playlistList.get(currentlyPlayingPlaylist); }
     Playlist getSelectedPlaylist() { return playlistList.get(currentlySelectedPlaylist); }
@@ -356,7 +356,7 @@ public class MusicPlayerController implements Runnable{
             skip = false;
             previous = false;
             jump = false;
-            updateImage = true;
+            updateSongData = true;
             getPlayingPlaylist().setVolume(volumeSlider.getValue() * 0.01);
 
 
@@ -379,16 +379,18 @@ public class MusicPlayerController implements Runnable{
                 }
 
                 Platform.runLater(() -> {
-                    if (updateProgressBar) songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
-                    secondsLabel.setText(String.format("%d:%02d",
-                            (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() / 60,
-                            (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() % 60));
-                    durationLabel.setText(String.format("%d:%02d",
-                            (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
-                            (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
-                    if (updateImage && getPlayingPlaylist().isPlayerReady()) {
+                    if (updateSongProgress) {
+                        songProgressSlider.setValue(getPlayingPlaylist().getCurrentSongProgress());
+                        secondsLabel.setText(String.format("%d:%02d",
+                                (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() / 60,
+                                (int)getPlayingPlaylist().getCurrentPlayingTimeSeconds() % 60));
+                    }
+                    if (updateSongData && getPlayingPlaylist().isPlayerReady()) {
+                        durationLabel.setText(String.format("%d:%02d",
+                                (int)getPlayingPlaylist().getCurrentSongLengthSeconds() / 60,
+                                (int)getPlayingPlaylist().getCurrentSongLengthSeconds() % 60));
                         coverArtView.setImage(getPlayingPlaylist().getPlayer().getCover());
-                        updateImage = false;
+                        updateSongData = false;
                     }
                 });
 
@@ -410,11 +412,13 @@ public class MusicPlayerController implements Runnable{
         stop = true;
         if (t != null) {
             try {
-                t.join(250L);
+                t.join(150L);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        updateSongProgress = false;
+        updateSongData = false;
         currentlyPlayingPlaylist = -1;
         currentArtistLabel.setText(" ");
         currentPlaylistLabel.setText(" ");
