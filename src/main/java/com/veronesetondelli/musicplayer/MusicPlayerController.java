@@ -256,10 +256,7 @@ public class MusicPlayerController implements Runnable {
      */
     void loadPlaylistMetadata(Playlist p) {
         metadataLoaderThread = new Thread(() -> {
-            Long begin = System.nanoTime();
             p.loadMetadata();
-            Long end = System.nanoTime();
-            System.out.println("Loading " + p.getPlaylistLength() + " songs took " + (end - begin) / 1000000 + " ms");
             songTableView.refresh();
         });
         metadataLoaderThread.start();
