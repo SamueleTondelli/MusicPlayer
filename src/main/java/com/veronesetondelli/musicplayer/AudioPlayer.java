@@ -16,7 +16,7 @@ public class AudioPlayer {
     private Timer timer;
     private TimerTask task;
 
-    AudioPlayer () {
+    AudioPlayer() {
         playing = false;
         playerIsReady = false;
     }
@@ -25,7 +25,8 @@ public class AudioPlayer {
         try {
             playerIsReady = false;
             media = song.getMedia();
-            if (mediaPlayer != null) mediaPlayer.dispose();
+            if (mediaPlayer != null)
+                mediaPlayer.dispose();
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setOnReady(() -> playerIsReady = true);
         } catch (Exception e) {
@@ -39,15 +40,6 @@ public class AudioPlayer {
             playing = true;
         }
         mediaPlayer.play();
-    }
-
-    public void pause() {
-        mediaPlayer.pause();
-    }
-
-    public void stop() {
-        cancelTimer();
-        mediaPlayer.stop();
     }
 
     private void beginTimer() {
@@ -70,27 +62,44 @@ public class AudioPlayer {
         timer.cancel();
     }
 
-    public boolean isPlaying() {
-        return playing;
+    public void pause() {
+        mediaPlayer.pause();
     }
 
-    public void setVolume(double volume) {
-        mediaPlayer.setVolume(volume);
+    public void stop() {
+        cancelTimer();
+        mediaPlayer.stop();
+    }
+
+    public boolean isPlaying() {
+        return playing;
     }
 
     public double getVolume() {
         return mediaPlayer.getVolume();
     }
 
-    public double getPlayingTimeSeconds() { return mediaPlayer.getCurrentTime().toSeconds(); }
+    public void setVolume(double volume) {
+        mediaPlayer.setVolume(volume);
+    }
 
-    public double getSongLengthSeconds() { return media.getDuration().toSeconds(); }
+    public double getPlayingTimeSeconds() {
+        return mediaPlayer.getCurrentTime().toSeconds();
+    }
+
+    public double getSongLengthSeconds() {
+        return media.getDuration().toSeconds();
+    }
 
     public void setSongProgress(double progress) {
         mediaPlayer.seek(Duration.millis((media.getDuration().toMillis() * progress) / 100));
     }
 
-    public boolean isPlayerReady() { return playerIsReady; }
+    public boolean isPlayerReady() {
+        return playerIsReady;
+    }
 
-    public Image getCover() { return (Image)media.getMetadata().get("image");}
+    public Image getCover() {
+        return (Image) media.getMetadata().get("image");
+    }
 }

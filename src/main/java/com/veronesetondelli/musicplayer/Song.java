@@ -1,18 +1,13 @@
 package com.veronesetondelli.musicplayer;
 
-import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.mp3.AudioFrame;
-import org.apache.tika.parser.mp3.MP3Frame;
-import org.xml.sax.ContentHandler;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.swing.text.html.ImageView;
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -25,14 +20,14 @@ public class Song {
     private String artist;
     private long duration;
     private boolean metadataHasBeenLoaded;
+
     public Song(String filePath) {
         fileName = Paths.get(filePath).getFileName().toString();
         fileLocation = filePath.substring(0, filePath.length() - 1 - fileName.length());
         metadataHasBeenLoaded = false;
     }
 
-    public String getFilePath() { return fileLocation + System.getProperty("file.separator") + fileName; }
-    public void loadMetadata(){
+    public void loadMetadata() {
         if (fileName.endsWith("wav")) {
             duration = -1;
             artist = "Unknown";
@@ -40,17 +35,21 @@ public class Song {
             return;
         }
         try (InputStream input = new FileInputStream(getFilePath())) {
-               ContentHandler handler = new DefaultHandler();
-               Metadata metadata = new Metadata();
-               Parser parser = new Mp3Parser();
-               ParseContext parseCtx = new ParseContext();
-               parser.parse(input, handler, metadata, parseCtx);
-               duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
-               artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
-               metadataHasBeenLoaded = true;
+            ContentHandler handler = new DefaultHandler();
+            Metadata metadata = new Metadata();
+            Parser parser = new Mp3Parser();
+            ParseContext parseCtx = new ParseContext();
+            parser.parse(input, handler, metadata, parseCtx);
+            duration = Long.parseLong(metadata.get("xmpDM:duration").split("\\.")[0]);
+            artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
+            metadataHasBeenLoaded = true;
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
+    }
+
+    public String getFilePath() {
+        return fileLocation + System.getProperty("file.separator") + fileName;
     }
 
     public Media getMedia() {
@@ -58,29 +57,31 @@ public class Song {
         return new Media(f.toURI().toString());
     }
 
-    public long getDuration() {
-        return duration;
-    }
-
     public String getFileName() {
         return fileName;
     }
+
     public boolean getMetadataHasBeenLoaded() {
         return metadataHasBeenLoaded;
     }
+
     public String getLocation() {
         return fileLocation;
     }
+
     public String getArtist() {
         return metadataHasBeenLoaded ? artist : "NA";
     }
+
     public String getDurationFormatted() {
         if (metadataHasBeenLoaded) {
             return duration >= 0 ? String.format("%d:%02d", getDuration() / 60, getDuration() % 60) : "--:--";
-        }
-        else {
+        } else {
             return "NA";
         }
     }
 
+    public long getDuration() {
+        return duration;
+    }
 }

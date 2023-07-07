@@ -14,10 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EditPlaylistController {
-    @FXML private TextField nameField;
-    @FXML private TableView<Song> songTableView;
-    @FXML private TableColumn<Song, String> locationColumn;
-    @FXML private TableColumn<Song, String> nameColumn;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TableView<Song> songTableView;
+    @FXML
+    private TableColumn<Song, String> locationColumn;
+    @FXML
+    private TableColumn<Song, String> nameColumn;
 
     private Playlist playlist;
 
@@ -43,11 +47,17 @@ public class EditPlaylistController {
         }
     }
 
+    void update() {
+        nameField.textProperty().setValue(playlist.getName());
+        songTableView.setItems(playlist.getSongList());
+    }
+
     @FXML
     void onLoadFolderPress() {
         DirectoryChooser chooser = new DirectoryChooser();
         File directory = chooser.showDialog(null);
-        if (directory == null) return;
+        if (directory == null)
+            return;
         Arrays.stream(directory.listFiles((dir, name) -> name.endsWith(".mp3") || name.endsWith(".wav"))).forEachOrdered(f -> playlist.addSong(f.getAbsolutePath()));
         update();
     }
@@ -55,7 +65,8 @@ public class EditPlaylistController {
     @FXML
     void onDownButtonPress() {
         int selectedIndex = songTableView.getSelectionModel().getSelectedIndex();
-        if (selectedIndex == -1 || selectedIndex == playlist.getPlaylistLength() - 1) return;
+        if (selectedIndex == -1 || selectedIndex == playlist.getPlaylistLength() - 1)
+            return;
         playlist.swapSongs(selectedIndex, selectedIndex + 1);
         update();
     }
@@ -63,21 +74,18 @@ public class EditPlaylistController {
     @FXML
     void onUpButtonPress() {
         int selectedIndex = songTableView.getSelectionModel().getSelectedIndex();
-        if (selectedIndex == -1 || selectedIndex == 0) return;
+        if (selectedIndex == -1 || selectedIndex == 0)
+            return;
         playlist.swapSongs(selectedIndex, selectedIndex - 1);
         update();
     }
 
     @FXML
     void onRemoveSongButtonPress() {
-        if (songTableView.getSelectionModel().getSelectedIndex() == -1) return;
+        if (songTableView.getSelectionModel().getSelectedIndex() == -1)
+            return;
         playlist.removeSong(songTableView.getSelectionModel().getSelectedIndex());
         update();
-    }
-
-    void update() {
-        nameField.textProperty().setValue(playlist.getName());
-        songTableView.setItems(playlist.getSongList());
     }
 
     Playlist getPlaylist() {

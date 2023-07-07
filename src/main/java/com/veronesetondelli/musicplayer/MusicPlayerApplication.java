@@ -8,20 +8,20 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class MusicPlayerApplication extends Application {
+    public static void main(String[] args) {
+        launch();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MusicPlayerApplication.class.getResource("music-player-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 600);
-        MusicPlayerController controller = (MusicPlayerController)fxmlLoader.getController();
+        MusicPlayerController controller = fxmlLoader.getController();
         stage.setOnCloseRequest((e) -> controller.handleClose());
         stage.setTitle("Music Player");
         stage.setScene(scene);
         stage.setMinHeight(400);
         stage.setMinWidth(600);
         stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch();
     }
 }

@@ -10,12 +10,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Playlist{
-    private ObservableList<Song> songList;
-    private AudioPlayer player;
+public class Playlist {
+    private final int NUMBER_LOADER_THREADS = 4;
+    private final ObservableList<Song> songList;
+    private final AudioPlayer player;
     private int index;
     private String name;
-    private final int NUMBER_LOADER_THREADS = 4;
 
     public Playlist(String name) {
         index = 0;
@@ -38,47 +38,68 @@ public class Playlist{
     public void setName(String name) {
         this.name = name;
     }
-    public ObservableList<Song> getSongList() {return songList; }
+
+    public ObservableList<Song> getSongList() {
+        return songList;
+    }
 
     public void addSong(String filePath) {
         songList.add(new Song(filePath));
     }
 
-    public void addSongs(List<String> songs) { songs.forEach(s -> songList.add(new Song(s)));}
+    public void addSongs(List<String> songs) {
+        songs.forEach(s -> songList.add(new Song(s)));
+    }
 
-    public void removeSong(int index) throws IndexOutOfBoundsException{ songList.remove(index); }
+    public void removeSong(int index) throws IndexOutOfBoundsException {
+        songList.remove(index);
+    }
 
-    public void removeAllSongs() { songList.clear(); }
+    public void removeAllSongs() {
+        songList.clear();
+    }
 
-    public void playCurrentIndex() { player.play(); }
+    public void playCurrentIndex() {
+        player.play();
+    }
 
-    public void pause() { player.pause(); }
+    public void pause() {
+        player.pause();
+    }
 
     public void loadCurrentIndex() {
         player.loadAudioFile(songList.get(index));
     }
-    public void nextSong() { index = (index + 1) % songList.size(); }
+
+    public void nextSong() {
+        index = (index + 1) % songList.size();
+    }
+
     public void previousSong() {
-        if((getCurrentSongProgress()) > 50) {
+        if ((getCurrentSongProgress()) > 50) {
             index = index == 0 ? songList.size() - 1 : index - 1;
         }
     }
 
-    public void setVolume(double volume) {
-        player.setVolume(volume);
+    public double getCurrentSongProgress() {
+        return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100;
+    }
+
+    public void setCurrentSongProgress(double progress) {
+        player.setSongProgress(progress);
     }
 
     public double getVolume() {
         return player.getVolume();
     }
 
+    public void setVolume(double volume) {
+        player.setVolume(volume);
+    }
+
     public String getCurrentSongName() {
         return songList.get(index).getFileName();
     }
-
-    public double getCurrentSongProgress() { return (player.getPlayingTimeSeconds() / player.getSongLengthSeconds()) * 100; }
-
-    public void setCurrentSongProgress(double progress) { player.setSongProgress(progress); }
 
     public ObservableList<String> getSongNames() {
         ObservableList<String> names = FXCollections.observableArrayList();
@@ -94,7 +115,10 @@ public class Playlist{
         songList.set(i2, s1);
     }
 
-    public int getPlaylistLength() { return songList.size(); }
+    public int getPlaylistLength() {
+        return songList.size();
+    }
+
     public void loadMetadata() {
         ExecutorService executor = Executors.newFixedThreadPool(NUMBER_LOADER_THREADS);
         songList.stream().filter(s -> !s.getMetadataHasBeenLoaded()).forEach(s -> executor.execute(s::loadMetadata));
@@ -111,6 +135,7 @@ public class Playlist{
             e.printStackTrace();
         }
     }
+
     public List<String> getSongsPathList() {
         List<String> l = new ArrayList<>();
         songList.forEach(s -> l.add(s.getFilePath()));
@@ -140,11 +165,12 @@ public class Playlist{
     public boolean isPlayerReady() {
         return player.isPlayerReady();
     }
+
     public AudioPlayer getPlayer() {
         return player;
     }
 
     public String getArtist() {
-       return songList.get(index).getArtist();
+        return songList.get(index).getArtist();
     }
 }
