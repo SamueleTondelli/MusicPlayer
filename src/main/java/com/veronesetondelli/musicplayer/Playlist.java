@@ -148,7 +148,11 @@ public class Playlist {
                 alert.showAndWait();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error loading metadata");
+            alert.setHeaderText("Error loading metadata");
+            alert.setContentText("Error loading metadata");
+            alert.showAndWait();
         }
     }
 

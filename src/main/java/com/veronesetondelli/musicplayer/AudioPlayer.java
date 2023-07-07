@@ -1,5 +1,6 @@
 package com.veronesetondelli.musicplayer;
 
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -62,7 +63,11 @@ public class AudioPlayer {
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setOnReady(() -> playerIsReady = true);
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: loading audio file");
+            alert.setContentText("Error: couldn't load audio file " + song.getFilePath() + ".");
+            alert.showAndWait();
         }
     }
 

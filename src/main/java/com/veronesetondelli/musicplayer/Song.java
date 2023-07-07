@@ -1,5 +1,6 @@
 package com.veronesetondelli.musicplayer;
 
+import javafx.scene.control.Alert;
 import javafx.scene.media.Media;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -32,13 +33,13 @@ public class Song {
         metadataHasBeenLoaded = false;
     }
 
-    public String getFilePath() {
-        return fileLocation + System.getProperty("file.separator") + fileName;
-    }
-
     public Media getMedia() {
         File f = new File(getFilePath());
         return new Media(f.toURI().toString());
+    }
+
+    public String getFilePath() {
+        return fileLocation + System.getProperty("file.separator") + fileName;
     }
 
     public String getFileName() {
@@ -89,7 +90,11 @@ public class Song {
             artist = Arrays.asList(metadata.names()).contains("xmpDM:artist") ? metadata.get("xmpDM:artist") : "Unknown";
             metadataHasBeenLoaded = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error loading metadata");
+            alert.setHeaderText("Error loading metadata");
+            alert.setContentText("Error loading metadata of " + getFilePath() + ".");
+            alert.showAndWait();
         }
     }
 }

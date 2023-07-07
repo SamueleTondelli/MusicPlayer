@@ -216,7 +216,11 @@ public class MusicPlayerController implements Runnable {
                 loadPlaylistMetadata(p);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: creating playlist");
+            alert.setContentText("Error while creating playlist.");
+            alert.showAndWait();
         }
     }
 
@@ -254,7 +258,11 @@ public class MusicPlayerController implements Runnable {
                 loadPlaylistMetadata(p);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: loading playlist");
+            alert.setContentText("Error: couldn't load playlist.");
+            alert.showAndWait();
         }
     }
 
@@ -271,7 +279,11 @@ public class MusicPlayerController implements Runnable {
                 mapper.writerWithDefaultPrettyPrinter().writeValue(file, getSelectedPlaylist().getSongsPathList());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: saving playlist");
+            alert.setContentText("Error: couldn't save playlist.");
+            alert.showAndWait();
         }
     }
 
@@ -310,7 +322,11 @@ public class MusicPlayerController implements Runnable {
                 loadPlaylistMetadata(playlistList.get(editingPlaylistIndex));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error: editing playlist");
+            alert.setContentText("Error while editing playlist.");
+            alert.showAndWait();
         }
     }
 
@@ -324,8 +340,7 @@ public class MusicPlayerController implements Runnable {
         if (t != null) {
             try {
                 t.join(150L);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
 
@@ -356,8 +371,7 @@ public class MusicPlayerController implements Runnable {
         if (metadataLoaderThread != null) {
             try {
                 metadataLoaderThread.join(3000L);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ignored) {
             }
         }
 
@@ -483,8 +497,7 @@ public class MusicPlayerController implements Runnable {
 
                 try {
                     Thread.sleep(100);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ignored) {
                     return;
                 }
             }
