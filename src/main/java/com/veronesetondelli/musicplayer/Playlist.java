@@ -90,7 +90,7 @@ public class Playlist {
         songs.forEach(s -> songList.add(new Song(s)));
     }
 
-    public void removeSong(int index) throws IndexOutOfBoundsException {
+    public void removeSong(int index) {
         songList.remove(index);
     }
 
@@ -135,14 +135,6 @@ public class Playlist {
 
     public String getCurrentSongName() {
         return songList.get(index).getFileName();
-    }
-
-    public ObservableList<String> getSongNames() {
-        ObservableList<String> names = FXCollections.observableArrayList();
-        for (Song s : songList) {
-            names.add(s.getFileName());
-        }
-        return names;
     }
 
     public void swapSongs(int i1, int i2) {
